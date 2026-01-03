@@ -1,0 +1,3214 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FunBank</title>
+  <style>
+    :root{
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --easeStd: cubic-bezier(.2,.0,0,1);
+      --easeDecel: cubic-bezier(0,0,0,1);
+      --dur1: 120ms;
+      --dur2: 200ms;
+      --dur3: 320ms;
+
+      --navH: 78px;
+
+      /* Light */
+      --bg: #f4f7fb;
+      --text: #0b1020;
+      --muted: #5c657a;
+
+      --surface: rgba(255,255,255,.78);
+      --surface2: rgba(255,255,255,.62);
+      --border: rgba(10,20,40,.10);
+
+      --shadow1: 0 1px 2px rgba(10,20,40,.08);
+      --shadow2: 0 14px 34px rgba(10,20,40,.14);
+
+      --radius: 20px;
+
+      /* FX */
+      --bgSpeed: 18s;
+      --warpStrength: 22px;
+      --grainOpacity: .08;
+      --glass: 1;
+
+      /* Brand gradient */
+      --turq: #2dd4bf;
+      --green: #22c55e;
+
+      /* Verification icon */
+      --verifyIcon: url("https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/check-circle-green-1024.png");
+
+      /* Controls */
+      --btnBg: rgba(255,255,255,.86);
+      --btnBorder: rgba(10,20,40,.10);
+      --btnText: var(--text);
+      --btnHover: rgba(255,255,255,.95);
+
+      --tonalBg: rgba(45,212,191,.12);
+      --tonalBorder: rgba(45,212,191,.20);
+
+      /* Splash wallpapers */
+      --splashLight: url("https://i.pinimg.com/originals/44/ab/30/44ab3036866eef94b5ff80b9b1572dc2.png");
+      --splashDark:  url("https://i.pinimg.com/736x/65/c7/11/65c71123621db3d03bc1101d80d05d0a.jpg");
+    }
+
+    [data-theme="dark"]{
+      --bg: #061018;
+      --text: #eef4ff;
+      --muted:#a9b4cc;
+
+      --surface: rgba(12,20,30,.68);
+      --surface2: rgba(12,20,30,.50);
+      --border: rgba(255,255,255,.14);
+
+      --shadow1: 0 1px 2px rgba(0,0,0,.30);
+      --shadow2: 0 18px 44px rgba(0,0,0,.50);
+
+      --btnBg: rgba(12,20,30,.78);
+      --btnBorder: rgba(255,255,255,.14);
+      --btnText: var(--text);
+      --btnHover: rgba(16,28,44,.84);
+
+      --tonalBg: rgba(45,212,191,.16);
+      --tonalBorder: rgba(45,212,191,.28);
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background: var(--bg);
+      overflow-x:hidden;
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ animation-duration: 1ms !important; transition-duration: 1ms !important; }
+    }
+
+    input[type="number"]{ appearance:textfield; -moz-appearance:textfield; }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+
+    /* Background */
+    .bg{ position: fixed; inset: 0; z-index: -6; pointer-events:none; background: var(--bg); }
+    .bg .blob{
+      position:absolute; width: 62vmax; height: 62vmax; border-radius: 999px;
+      filter: blur(var(--warpStrength));
+      opacity: .95;
+      transform: translate3d(0,0,0);
+      animation: float var(--bgSpeed) var(--easeDecel) infinite alternate;
+      mix-blend-mode: multiply;
+    }
+    .bg .b1{ left:-18vmax; top:-22vmax; background: radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--turq) 70%, var(--green) 30%), transparent 62%); }
+    .bg .b2{ right:-18vmax; top:-10vmax; background: radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--green) 70%, var(--turq) 30%), transparent 62%); animation-duration: calc(var(--bgSpeed) * 1.12); }
+    .bg .b3{ left: 8vmax; bottom:-28vmax; background: radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--turq) 55%, #60a5fa 45%), transparent 62%); animation-duration: calc(var(--bgSpeed) * 1.32); }
+    @keyframes float{ from{ transform: translate3d(-2.4vmax, 0, 0) scale(1); } to{ transform: translate3d(2.4vmax, -1.1vmax, 0) scale(1.03); } }
+    .grain{
+      position: fixed; inset: 0; z-index: -5; pointer-events:none;
+      opacity: var(--grainOpacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
+      mix-blend-mode: soft-light;
+    }
+
+    /* Tab FX */
+    .tabFx{ position: fixed; inset: -30px; z-index: 120; pointer-events:none; opacity:0; }
+    .tabFx.show{ animation: tabFx 560ms var(--easeDecel); }
+    .tabFx::before{
+      content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(900px 520px at 25% 30%, color-mix(in oklab, var(--turq) 80%, var(--green) 20%), transparent 60%),
+        radial-gradient(900px 520px at 80% 35%, color-mix(in oklab, var(--green) 80%, var(--turq) 20%), transparent 60%),
+        linear-gradient(90deg, rgba(45,212,191,.18), rgba(34,197,94,.18));
+      filter: blur(18px);
+      mix-blend-mode: screen;
+      opacity: .95;
+    }
+    .tabFx::after{
+      content:""; position:absolute; inset:0;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: .9;
+    }
+    @keyframes tabFx{ 0%{ opacity:0; transform: scale(1.02); } 25%{ opacity:.92; } 100%{ opacity:0; transform: scale(1); } }
+
+    /* Splash */
+    .splash{ position: fixed; inset: 0; z-index: 200; display:none; background:#000; color:#fff; overflow:hidden; }
+    .splash.show{ display:block; }
+    .splash .photo{
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.26) 45%, rgba(0,0,0,.70)),
+        var(--splashLight);
+      background-size: cover, cover;
+      background-position: center, center;
+      transform: scale(1.04);
+      filter: blur(12px) saturate(1.05) contrast(1.02);
+    }
+    [data-theme="dark"] .splash .photo{
+      background-image:
+        linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.28) 45%, rgba(0,0,0,.78)),
+        var(--splashDark);
+      background-size: cover, cover;
+      background-position: center, center;
+      filter: blur(12px) saturate(1.06) contrast(1.05);
+    }
+    .splash .photo::after{
+      content:""; position:absolute; inset:-30px;
+      background:
+        radial-gradient(900px 540px at 25% 30%, rgba(45,212,191,.28), transparent 62%),
+        radial-gradient(900px 540px at 80% 35%, rgba(34,197,94,.24), transparent 62%),
+        linear-gradient(90deg, rgba(45,212,191,.10), rgba(34,197,94,.10));
+      filter: blur(18px);
+      mix-blend-mode: screen;
+      animation: splashFlow 9s var(--easeDecel) infinite alternate;
+      opacity: .95;
+    }
+    @keyframes splashFlow{ from{ transform: translate3d(-2vmax, .5vmax,0) scale(1); } to{ transform: translate3d(2vmax, -1vmax,0) scale(1.02); } }
+    .splash .welcome{
+      position:absolute; left: 18px; right: 18px; top: 36%;
+      transform: translateY(-50%);
+      text-align:center;
+      font-weight: 950;
+      letter-spacing: .2px;
+      font-size: clamp(22px, 3.1vw, 34px);
+      text-shadow: 0 12px 30px rgba(0,0,0,.65);
+      padding: 0 10px;
+    }
+    .splash .welcome small{
+      display:block;
+      font-weight: 800;
+      margin-top: 10px;
+      opacity: .85;
+      font-size: 12px;
+    }
+    .pinBox{
+      position:absolute;
+      left: 18px; right: 18px;
+      top: 60%;
+      transform: translateY(-50%);
+      display:none;
+      justify-content:center;
+    }
+    .pinCard{
+      width: min(440px, 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 14px;
+      box-shadow: 0 18px 44px rgba(0,0,0,.55);
+    }
+    .pinDots{ display:flex; gap:10px; justify-content:center; margin: 10px 0 12px; }
+    .pinDot{
+      width: 12px; height: 12px; border-radius: 99px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .pinDot.filled{ background: rgba(45,212,191,.85); border-color: rgba(45,212,191,.75); }
+    .pinInput{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.30);
+      color:#fff;
+      outline:none;
+      font: 800 16px/1 var(--font);
+      letter-spacing: 10px;
+      text-align:center;
+    }
+    .pinBtns{ display:flex; gap:10px; justify-content:center; margin-top: 10px; }
+    .pinBtn{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.12);
+      color:#fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .pinBtn.primary{
+      background: linear-gradient(135deg, rgba(45,212,191,.95), rgba(34,197,94,.95));
+      color:#04140a;
+      border-color: rgba(255,255,255,.10);
+    }
+    .pinHint{ text-align:center; font-size: 12px; opacity: .85; margin-top: 8px; }
+
+    /* Layout */
+    .app{ max-width: 1100px; margin: 0 auto; padding: 16px 14px calc(var(--navH) + 18px); }
+    .topbar{
+      position: sticky; top: 0; z-index: 40;
+      padding: 12px 0 14px;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .topbarInner{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .logo{
+      width:44px;height:44px;border-radius: 14px;
+      background: linear-gradient(135deg, var(--turq), var(--green));
+      display:grid;place-items:center;
+      color:#06210f; font-weight: 900;
+      box-shadow: var(--shadow2);
+      transition: transform var(--dur2) var(--easeStd);
+      flex: 0 0 auto;
+    }
+    .logo:active{ transform: scale(.98); }
+    .btxt h1{ margin:0; font-size:16px; letter-spacing:.2px; }
+    .btxt .sub{ margin-top:2px; font-size:12px; color:var(--muted); }
+
+    .profileChip{
+      display:flex; align-items:center; gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--surface) 92%, transparent);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow1);
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor:pointer;
+      min-width: 210px;
+      justify-content:flex-start;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: #f59e0b;
+      box-shadow: 0 0 0 4px rgba(245,158,11,.15);
+      flex: 0 0 auto;
+    }
+    .chipTitle{ font-weight:900; font-size:13px; line-height:1.1; display:flex; gap:8px; align-items:center;}
+    .chipSub{ font-size:12px; color:var(--muted); }
+
+    /* Cards */
+    .grid{ display:grid; grid-template-columns: 1.15fr .85fr; gap: 14px; }
+    @media (max-width: 920px){ .grid{ grid-template-columns:1fr; } }
+
+    .card{
+      background: color-mix(in oklab, var(--surface) calc(var(--glass) * 100%), transparent calc((1 - var(--glass)) * 100%));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow1);
+      overflow:hidden;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .cardHd{
+      padding: 14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(45,212,191,.10), transparent);
+    }
+    .cardHd h2{ margin:0; font-size:13px; letter-spacing:.2px; }
+    .cardBd{ padding: 14px 16px; }
+
+    .mono{ font-variant-numeric: tabular-nums; font-feature-settings:"tnum" 1; }
+    .hr{ height:1px; background: var(--border); margin: 12px 0; }
+    .hint{ font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    /* Buttons */
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .btn{
+      position:relative;
+      border: 1px solid var(--btnBorder);
+      background: var(--btnBg);
+      color: var(--btnText);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor:pointer;
+      user-select:none;
+      overflow:hidden;
+      transition: transform var(--dur1) var(--easeStd), box-shadow var(--dur2) var(--easeStd), background var(--dur2) var(--easeStd), border-color var(--dur2) var(--easeStd);
+      box-shadow: 0 1px 0 rgba(0,0,0,.00);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .btn:hover{ transform: translateY(-1px) scale(1.01); box-shadow: var(--shadow1); background: var(--btnHover); border-color: rgba(45,212,191,.26); }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    .btn.primary{
+      background: linear-gradient(135deg, var(--turq), var(--green));
+      border-color: rgba(255,255,255,.12);
+      color: #04140a;
+      box-shadow: 0 18px 34px rgba(34,197,94,.16);
+    }
+    .btn.primary:hover{ filter: saturate(1.06) brightness(1.02); }
+
+    .btn.tonal{ background: var(--tonalBg); border-color: var(--tonalBorder); }
+    .btn.small{ padding: 8px 12px; font-size: 13px; }
+
+    /* Inputs */
+    .field{ display:grid; gap:6px; margin: 10px 0; }
+    label{ font-size: 12px; color: var(--muted); }
+    input, textarea{
+      border: 1px solid var(--btnBorder);
+      border-radius: 14px;
+      padding: 12px 12px;
+      background: var(--btnBg);
+      outline: none;
+      color: var(--text);
+      transition: border-color var(--dur2) var(--easeStd), box-shadow var(--dur2) var(--easeStd), background var(--dur2) var(--easeStd);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font: inherit;
+    }
+    input:focus, textarea:focus{
+      border-color: rgba(45,212,191,.60);
+      box-shadow: 0 0 0 4px rgba(45,212,191,.16);
+    }
+    textarea{ min-height: 84px; resize: vertical; }
+
+    select{
+      border: 1px solid var(--btnBorder);
+      border-radius: 14px;
+      padding: 12px 12px;
+      background: var(--btnBg);
+      outline: none;
+      color: var(--text);
+      transition: border-color var(--dur2) var(--easeStd), box-shadow var(--dur2) var(--easeStd), background var(--dur2) var(--easeStd);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font: inherit;
+    }
+    select:focus{
+      border-color: rgba(45,212,191,.60);
+      box-shadow: 0 0 0 4px rgba(45,212,191,.16);
+    }
+
+    .split{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width: 560px){ .split{ grid-template-columns: 1fr; } }
+
+    /* Lists */
+    .list{ display:grid; gap:10px; }
+    .item{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: border-color var(--dur2) var(--easeStd), background var(--dur2) var(--easeStd);
+      min-width: 0; /* fix overflow in flex */
+    }
+    .item:hover{ border-color: rgba(45,212,191,.22); }
+    .left{ display:flex; align-items:center; gap:12px; min-width:0; }
+    .emoji{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      border: 1px solid var(--border);
+      background: var(--btnBg);
+      box-shadow: 0 1px 0 rgba(10,20,40,.04);
+      font-size: 20px;
+      flex: 0 0 auto;
+    }
+    .name{ font-weight: 950; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 440px; }
+    .sub{ font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .price{
+      text-align:right;
+      display:grid;
+      gap:2px;
+      min-width: 0; /* fix overflow */
+      justify-items: end;
+    }
+    .tag{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--btnBorder);
+      background: var(--btnBg);
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      white-space:nowrap;
+    }
+
+    /* Verification badge (closer to nick) */
+    .verifyBadge{
+      display:inline-block;
+      width: 14px;
+      height: 14px;
+      margin-left: 2px; /* closer */
+      vertical-align: -2px;
+      background-image: var(--verifyIcon);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* TX list overflow fix: allow scrolling inside Operations card */
+    #txList{
+      max-height: 420px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    #txList::-webkit-scrollbar{ width: 10px; }
+    #txList::-webkit-scrollbar-thumb{
+      background: color-mix(in oklab, var(--border) 90%, transparent);
+      border-radius: 999px;
+    }
+
+    .screen{ display:none; }
+    .screen.active{ display:block; }
+    .enter{ animation: enter 260ms var(--easeDecel); }
+    @keyframes enter{ from{ opacity:0; transform: translateY(8px) scale(.985); } to{ opacity:1; transform: translateY(0) scale(1); } }
+
+    /* Bottom nav */
+    .nav{
+      position:fixed; left:0; right:0; bottom:0;
+      height: var(--navH);
+      z-index: 60;
+      background: color-mix(in oklab, var(--surface) 92%, transparent);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .navInner{
+      max-width: 1100px;
+      margin: 0 auto;
+      height:100%;
+      padding: 10px 12px;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      align-items:center;
+    }
+    .tab{
+      position:relative;
+      height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--btnBorder);
+      background: var(--btnBg);
+      display:grid;
+      justify-items:center;
+      align-content:center;
+      gap:4px;
+      cursor:pointer;
+      user-select:none;
+      overflow:hidden;
+      transition: box-shadow var(--dur2) var(--easeStd), border-color var(--dur2) var(--easeStd), background var(--dur2) var(--easeStd);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      outline: none;
+    }
+    .tab:hover{ box-shadow: var(--shadow1); background: var(--btnHover); }
+    .tab::before{
+      content:"";
+      position:absolute; inset:-34%;
+      background: linear-gradient(120deg, rgba(45,212,191,.72), rgba(34,197,94,.72));
+      filter: blur(16px);
+      opacity: .0;
+      transition: opacity var(--dur2) var(--easeStd);
+      mix-blend-mode: screen;
+      animation: navFlow 6.5s var(--easeDecel) infinite alternate;
+    }
+    @keyframes navFlow{
+      from{ transform: translate3d(-6%, 0, 0) rotate(0deg) scale(1); }
+      to{ transform: translate3d(6%, -3%, 0) rotate(8deg) scale(1.03); }
+    }
+    .tab.active{ border-color: rgba(45,212,191,.44); box-shadow: 0 16px 34px rgba(34,197,94,.14); }
+    .tab.active::before{ opacity: .95; }
+    .tab .ic{ font-size: 16px; position:relative; z-index:1; }
+    .tab .tx{ font-size: 11px; color: var(--muted); font-weight: 950; position:relative; z-index:1; }
+
+    /* Sidebar */
+    .sidebarBackdrop{
+      position: fixed; inset:0;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      z-index: 140;
+      display:none;
+    }
+    .sidebarBackdrop.show{ display:block; animation: fadeIn 180ms var(--easeStd); }
+    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    .sidebar{
+      position: fixed; top: 0; bottom: 0; left: 0;
+      width: min(380px, 92vw);
+      z-index: 150;
+      transform: translateX(-102%);
+      transition: transform 240ms var(--easeDecel);
+      background: color-mix(in oklab, var(--surface) 96%, transparent);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 30px 0 60px rgba(0,0,0,.18);
+      display:grid; grid-template-rows: auto 1fr auto;
+      overflow:hidden;
+    }
+    .sidebar.show{ transform: translateX(0); }
+    .sbHd{ padding: 16px; border-bottom:1px solid var(--border); }
+    .sbUser{ display:flex; gap:12px; align-items:center; }
+    .avatar{
+      width:50px;height:50px;border-radius:18px;
+      background: linear-gradient(135deg, var(--turq), var(--green));
+      box-shadow: var(--shadow2);
+      display:grid; place-items:center;
+      color:#06210f; font-weight: 1000;
+      flex: 0 0 auto;
+      overflow:hidden;
+      position:relative;
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:none; }
+    .sbNick{ font-weight: 950; display:flex; gap:6px; align-items:center; min-width:0; }
+    .sbMeta{ font-size:12px; color: var(--muted); margin-top:2px; line-height:1.25; }
+    .sbBd{ padding: 10px 12px; overflow:auto; }
+    .sbItem{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border:1px solid transparent;
+      cursor:pointer;
+      user-select:none;
+      position:relative;
+      overflow:hidden;
+      width: 100%;
+      flex: 0 0 auto;
+      transition: background var(--dur2) var(--easeStd),
+                  border-color var(--dur2) var(--easeStd),
+                  filter var(--dur2) var(--easeStd);
+    }
+    .sbItem::before{
+      content:"";
+      position:absolute; inset:-30%;
+      background: linear-gradient(120deg, rgba(45,212,191,.40), rgba(34,197,94,.40));
+      filter: blur(16px);
+      opacity: 0;
+      transition: opacity var(--dur2) var(--easeStd);
+      mix-blend-mode: screen;
+    }
+    .sbItem:hover{ border-color: rgba(45,212,191,.18); filter: brightness(1.02); }
+    .sbItem:hover::before{ opacity: 1; }
+    .sbItem:active{ filter: brightness(0.99); }
+    .sbItem > *{ position:relative; z-index:1; }
+    .sbL{ display:flex; gap:10px; align-items:center; min-width:0; }
+    .sbIc{
+      width:36px;height:36px;border-radius: 14px;
+      background: var(--btnBg);
+      border:1px solid var(--border);
+      display:grid; place-items:center;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      flex: 0 0 auto;
+    }
+    .sbTx{ font-weight: 950; min-width: 0; overflow:hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sbFt{ padding: 12px 16px; border-top:1px solid var(--border); }
+
+    /* ===== Pretty File ===== */
+    .fileRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .fileBtn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--btnBorder);
+      background: var(--btnBg);
+      color: var(--btnText);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 950;
+      cursor:pointer;
+      user-select:none;
+      transition: background var(--dur2) var(--easeStd), border-color var(--dur2) var(--easeStd), box-shadow var(--dur2) var(--easeStd), transform var(--dur1) var(--easeStd);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .fileBtn:hover{
+      background: var(--btnHover);
+      border-color: rgba(45,212,191,.26);
+      box-shadow: var(--shadow1);
+      transform: translateY(-1px);
+    }
+    .fileBtn:active{ transform: translateY(0px) scale(.99); }
+    .fileName{
+      font-size: 12px;
+      color: var(--muted);
+      max-width: 520px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .fileHidden{
+      position:absolute;
+      width:1px; height:1px;
+      padding:0; margin:-1px;
+      overflow:hidden;
+      clip: rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+    /* ===== Centered product modal (bigger) ===== */
+    .sheetBackdrop{
+      display:none;
+      position: fixed;
+      inset: 0;
+      z-index: 170;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .sheetBackdrop.show{ display:block; }
+
+    .sheet{
+      display:none;
+      position: fixed;
+      z-index: 175;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(.98);
+      width: min(760px, calc(100% - 28px));
+      max-height: min(78vh, 720px);
+      overflow:auto;
+
+      background: color-mix(in oklab, var(--surface) 96%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .sheet.show{ display:block; animation: sheetPop 220ms var(--easeDecel) forwards; }
+    @keyframes sheetPop{
+      from{ opacity:0; transform: translate(-50%, -50%) scale(.96); }
+      to{ opacity:1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .sheetHd{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: color-mix(in oklab, var(--surface) 92%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .sheetHd b{ font-weight: 950; }
+    .sheetBd{ padding: 14px 16px 16px; }
+
+    .sheetGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 620px){
+      .sheetGrid{ grid-template-columns:1fr; }
+    }
+    .sheetBtn{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 14px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--btnBorder);
+      background: var(--btnBg);
+      cursor:pointer;
+      user-select:none;
+      font-weight: 950;
+      transition: background var(--dur2) var(--easeStd), border-color var(--dur2) var(--easeStd), box-shadow var(--dur2) var(--easeStd), transform var(--dur1) var(--easeStd);
+    }
+    .sheetBtn:hover{
+      background: var(--btnHover);
+      border-color: rgba(45,212,191,.26);
+      box-shadow: var(--shadow1);
+      transform: translateY(-1px);
+    }
+    .sheetBtn:active{ transform: translateY(0px) scale(.99); }
+    .sheetBtn .l{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .sheetBtn .ic{
+      width:40px; height:40px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: var(--surface2);
+      display:grid; place-items:center;
+    }
+
+    /* Carousel */
+    .carousel{
+      display:flex;
+      gap: 12px;
+      overflow:auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+    }
+    .carousel::-webkit-scrollbar{ height: 10px; }
+    .carousel::-webkit-scrollbar-thumb{
+      background: color-mix(in oklab, var(--border) 90%, transparent);
+      border-radius: 999px;
+    }
+    .slide{
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+    }
+    .bankCard{
+      border-radius: 22px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.18);
+      background:
+        radial-gradient(900px 420px at 10% 20%, rgba(45,212,191,.30), transparent 60%),
+        radial-gradient(900px 420px at 90% 40%, rgba(34,197,94,.26), transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position:relative;
+      overflow:hidden;
+      min-height: 150px;
+    }
+    [data-theme="dark"] .bankCard{
+      border-color: rgba(255,255,255,.14);
+      background:
+        radial-gradient(900px 420px at 10% 20%, rgba(45,212,191,.20), transparent 60%),
+        radial-gradient(900px 420px at 90% 40%, rgba(34,197,94,.18), transparent 60%),
+        linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+    }
+    .bankCard::after{
+      content:"";
+      position:absolute; inset:-34%;
+      background: linear-gradient(120deg, rgba(45,212,191,.35), rgba(34,197,94,.35));
+      filter: blur(20px);
+      opacity:.75;
+      animation: navFlow 7s var(--easeDecel) infinite alternate;
+      mix-blend-mode: screen;
+      pointer-events:none;
+    }
+    .cardTop{ display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; z-index:1; }
+    .cardBrand{ font-weight: 950; letter-spacing:.3px; }
+    .cardType{ font-size:12px; color: var(--muted); font-weight: 900; }
+    .cardNum{ margin-top: 18px; font-size: 18px; letter-spacing: 2.2px; font-weight: 950; position:relative; z-index:1; }
+    .cardMeta{ margin-top: 12px; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; font-size:12px; color: var(--muted); font-weight: 900; }
+
+    /* Toast */
+    .toasts{ position:fixed; right:14px; top:14px; display:grid; gap:10px; z-index: 80; }
+    .toast{
+      min-width: 260px; max-width: 420px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      background: color-mix(in oklab, var(--surface) 92%, transparent);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow2);
+      animation: enter 220ms var(--easeDecel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: var(--text);
+    }
+    .toast b{ display:block; margin-bottom:4px; }
+    .toast small{ color: var(--muted); }
+
+    /* Admin/Settings polish */
+    .settingsGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 860px){ .settingsGrid{ grid-template-columns:1fr; } }
+    .panel{
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .panel::before{
+      content:"";
+      position:absolute; inset:-45%;
+      background: linear-gradient(120deg, rgba(45,212,191,.16), rgba(34,197,94,.14));
+      filter: blur(20px);
+      opacity: .85;
+      mix-blend-mode: screen;
+      pointer-events:none;
+    }
+    .panel > *{ position:relative; z-index:1; }
+    .panelHd{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 6px;
+    }
+    .panelHd b{ font-weight: 950; }
+    .miniRow{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .avatarPreview{
+      width: 56px; height: 56px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--btnBg);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      font-weight: 1000;
+      color: color-mix(in oklab, var(--text) 65%, transparent);
+    }
+    .avatarPreview img{ width:100%; height:100%; object-fit:cover; display:none; }
+  </style>
+</head>
+
+<body data-theme="light">
+  <div class="bg" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="tabFx" id="tabFx" aria-hidden="true"></div>
+
+  <div class="splash" id="splash">
+    <div class="photo"></div>
+    <div class="welcome" id="splashWelcome">Добро пожаловать в FunBank</div>
+
+    <div class="pinBox" id="pinBox">
+      <div class="pinCard">
+        <div class="hint" style="text-align:center; color: rgba(255,255,255,.85);">Введите PIN (4 цифры)</div>
+        <div class="pinDots" id="pinDots">
+          <div class="pinDot"></div><div class="pinDot"></div><div class="pinDot"></div><div class="pinDot"></div>
+        </div>
+        <input class="pinInput" id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••" />
+        <div class="pinBtns">
+          <button class="pinBtn" id="pinCancel">Выйти</button>
+          <button class="pinBtn primary" id="pinOk">Войти</button>
+        </div>
+        <div class="pinHint" id="pinHint">PIN включается в настройках аккаунта (не обязательно).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebarBackdrop" id="sbBackdrop"></div>
+  <aside class="sidebar" id="sidebar" aria-label="Меню">
+    <div class="sbHd">
+      <div class="sbUser">
+        <div class="avatar" id="sbAvatar">
+          <span id="sbAvatarText">FB</span>
+          <img id="sbAvatarImg" alt="avatar" />
+        </div>
+        <div style="min-width:0">
+          <div class="sbNick" id="sbNick">Гость</div>
+          <div class="sbMeta" id="sbMeta">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sbBd">
+      <div class="sbItem" data-nav="home"><div class="sbL"><div class="sbIc">🏠</div><div class="sbTx">Главная</div></div><div class="tag">tab</div></div>
+      <div class="sbItem" data-nav="market"><div class="sbL"><div class="sbIc">🛒</div><div class="sbTx">Маркет</div></div><div class="tag">shop</div></div>
+      <div class="sbItem" data-nav="transfer"><div class="sbL"><div class="sbIc">💸</div><div class="sbTx">Переводы</div></div><div class="tag">pay</div></div>
+      <div class="sbItem" data-nav="top"><div class="sbL"><div class="sbIc">🏆</div><div class="sbTx">Топ</div></div><div class="tag">rank</div></div>
+      <div class="sbItem" data-nav="profile"><div class="sbL"><div class="sbIc">👤</div><div class="sbTx">Профиль</div></div><div class="tag">me</div></div>
+
+      <!-- NEW: What's new -->
+      <div class="sbItem" data-nav="whatsnew"><div class="sbL"><div class="sbIc">🆕</div><div class="sbTx">Что нового</div></div><div class="tag">new</div></div>
+
+      <div class="sbItem" data-nav="settings"><div class="sbL"><div class="sbIc">⚙️</div><div class="sbTx">Настройки</div></div><div class="tag">pin</div></div>
+      <div class="sbItem" data-nav="ui"><div class="sbL"><div class="sbIc">🎨</div><div class="sbTx">Оформление</div></div><div class="tag">UI</div></div>
+
+      <div class="hr"></div>
+
+      <div class="sbItem" id="sbAdminItem" style="display:none" data-nav="admin">
+        <div class="sbL"><div class="sbIc">🛡️</div><div class="sbTx">Админ-панель</div></div>
+        <div class="tag">only</div>
+      </div>
+    </div>
+
+    <div class="sbFt">
+      <div class="btns">
+        <button class="btn small tonal" id="btnSbTheme">Тема</button>
+        <button class="btn small" id="btnSbClose">Закрыть</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Centered product modal -->
+  <div class="sheetBackdrop" id="sheetBackdrop"></div>
+  <div class="sheet" id="sheet">
+    <div class="sheetHd">
+      <b>Создать продукт</b>
+      <button class="btn small" id="btnSheetClose" type="button">Закрыть</button>
+    </div>
+    <div class="sheetBd">
+      <div class="sheetGrid">
+        <div class="sheetBtn" data-create="deposit"><div class="l"><div class="ic">🏦</div><div class="tx">Вклад</div></div><div class="tag">+3%</div></div>
+        <div class="sheetBtn" data-create="account"><div class="l"><div class="ic">💳</div><div class="tx">Счёт</div></div><div class="tag">multi</div></div>
+        <div class="sheetBtn" data-create="bizcard"><div class="l"><div class="ic">🏢</div><div class="tx">Карта для бизнеса</div></div><div class="tag">4242</div></div>
+        <div class="sheetBtn" data-create="mortgage"><div class="l"><div class="ic">🏠</div><div class="tx">Ипотека</div></div><div class="tag">demo</div></div>
+      </div>
+      <div class="hint">Созданные продукты появятся на главной в блоке “Мои продукты”.</div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+
+  <div class="app">
+    <div class="topbar">
+      <div class="topbarInner">
+        <div class="brand">
+          <div class="logo">FB</div>
+          <div class="btxt">
+            <h1>FunBank</h1>
+            <div class="sub">native selects · centered modal · PIN OK</div>
+          </div>
+        </div>
+
+        <div class="profileChip" id="chip" title="Открыть меню">
+          <div class="dot" id="dot"></div>
+          <div style="min-width:0">
+            <div class="chipTitle" id="chipTitle">Гость</div>
+            <div class="chipSub" id="chipSub">нажми, чтобы открыть sidebar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTH -->
+    <section class="screen active enter" id="screen-auth">
+      <div class="grid">
+        <div class="card">
+          <div class="cardHd"><h2>Вход</h2><span class="tag">local</span></div>
+          <div class="cardBd">
+            <div class="field">
+              <label>Ник</label>
+              <input id="loginNick" placeholder="например: Lunkes" autocomplete="username" />
+            </div>
+            <div class="field">
+              <label>Пароль</label>
+              <input id="loginPass" placeholder="••••••••" type="password" autocomplete="current-password" />
+            </div>
+            <div class="btns">
+              <button class="btn primary" id="btnLogin" type="button">Войти</button>
+              <button class="btn tonal" id="btnGoRegister" type="button">Создать аккаунт</button>
+              <button class="btn tonal" data-nav="ui" type="button">Оформление</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHd"><h2>Быстрые настройки</h2><span class="tag">theme</span></div>
+          <div class="cardBd">
+            <div class="btns">
+              <button class="btn tonal" id="btnThemeLight" type="button">Светлая</button>
+              <button class="btn tonal" id="btnThemeDark" type="button">Тёмная</button>
+              <button class="btn tonal" id="btnShowSplashNow" type="button">Показать приветствие</button>
+            </div>
+            <div class="hint">Приветствие показывается только если ты вошёл. Если включен PIN — спросит PIN.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="registerCard" style="margin-top:14px; display:none">
+        <div class="cardHd"><h2>Регистрация</h2><span class="tag">страна · язык</span></div>
+        <div class="cardBd">
+          <div class="split">
+            <div class="field"><label>Ник (уникальный)</label><input id="regNick" placeholder="например: panda_bank" autocomplete="username" /></div>
+            <div class="field"><label>Пароль</label><input id="regPass" placeholder="минимум 4 символа" type="password" autocomplete="new-password" /></div>
+          </div>
+
+          <div class="split">
+            <div class="field">
+              <label>Страна</label>
+              <select id="regCountry"></select>
+            </div>
+            <div class="field">
+              <label>Язык</label>
+              <select id="regLang"></select>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="field">
+              <label>Стартовый бонус</label>
+              <select id="regBonus">
+                <option value="small">Скромный</option>
+                <option value="normal" selected>Обычный</option>
+                <option value="rich">Жирный</option>
+              </select>
+            </div>
+            <div class="field"><label>&nbsp;</label><button class="btn primary" id="btnRegister" type="button">Создать</button></div>
+          </div>
+          <div class="btns"><button class="btn" id="btnCancelRegister" type="button">Отмена</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOME -->
+    <section class="screen" id="screen-home">
+      <div class="grid">
+        <div class="card">
+          <div class="cardHd">
+            <h2>Главная</h2>
+            <div class="btns">
+              <button class="btn small tonal" id="btnDaily" type="button">🎁 Дейли</button>
+              <button class="btn small tonal" data-nav="ui" type="button">🎨 Оформление</button>
+              <button class="btn small" id="btnLogout" type="button">Выйти</button>
+            </div>
+          </div>
+
+          <div class="cardBd">
+            <div class="carousel" id="cardCarousel" aria-label="Карты">
+              <div class="slide">
+                <div class="bankCard">
+                  <div class="cardTop">
+                    <div>
+                      <div class="cardBrand">FunBank</div>
+                      <div class="cardType">FanCard</div>
+                    </div>
+                    <div class="tag">FanCard</div>
+                  </div>
+                  <div class="cardNum mono" id="cardNumber">6767 •••• •••• ••••</div>
+                  <div class="cardMeta">
+                    <div id="cardHolder">—</div>
+                    <div id="cardExp">EXP 12/30</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="slide" id="bizSlide" style="display:none;">
+                <div class="bankCard">
+                  <div class="cardTop">
+                    <div>
+                      <div class="cardBrand">FunBank</div>
+                      <div class="cardType">Business Card</div>
+                    </div>
+                    <div class="tag">Biz</div>
+                  </div>
+                  <div class="cardNum mono" id="bizCardNumber">4242 •••• •••• ••••</div>
+                  <div class="cardMeta">
+                    <div id="bizCardHolder">—</div>
+                    <div id="bizCardExp">EXP 12/30</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:950;font-size:12px;color:var(--muted)">Баланс</div>
+            <div class="mono" style="font-size:34px;font-weight:950;letter-spacing:-.6px" id="mainBalance">—</div>
+            <div class="hint mono" id="mainHint">—</div>
+
+            <div class="hr"></div>
+
+            <div class="btns">
+              <button class="btn primary" data-nav="transfer" type="button">💸 Перевод</button>
+              <button class="btn primary" data-nav="exchange" type="button">💱 Обмен</button>
+              <button class="btn tonal" data-nav="market" type="button">🛒 Маркет</button>
+              <button class="btn tonal" data-nav="accounts" type="button">🏦 Счета</button>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="item">
+              <div class="left">
+                <div class="emoji">🌍</div>
+                <div style="min-width:0">
+                  <div class="name" id="who">—</div>
+                  <div class="sub" id="who2">—</div>
+                </div>
+              </div>
+              <div class="price">
+                <div class="tag mono" id="fxLine">—</div>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="card" style="box-shadow:none;">
+              <div class="cardHd" style="border-radius:18px 18px 0 0;">
+                <h2>Мои продукты</h2>
+                <span class="tag">вклад · счёт · ипотека</span>
+              </div>
+              <div class="cardBd">
+                <div class="list" id="homeProductsList"></div>
+                <div class="hint" id="homeProductsEmpty" style="display:none">Пока пусто. Создай продукт в “Счета”.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHd"><h2>Операции</h2><span class="tag">последние</span></div>
+          <div class="cardBd">
+            <div class="list" id="txList"></div>
+            <div class="hint" id="txEmpty" style="display:none">Пока пусто.</div>
+            <div class="hint" style="margin-top:10px">Если операций много — прокручивай список.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSFER -->
+    <section class="screen" id="screen-transfer">
+      <div class="card">
+        <div class="cardHd"><h2>Перевод</h2><span class="tag">по нику / по карте</span></div>
+        <div class="cardBd">
+          <div class="split">
+            <div class="field">
+              <label>Кому</label>
+              <select id="trMode">
+                <option value="nick" selected>По нику</option>
+                <option value="card">По номеру карты</option>
+              </select>
+              <div class="hint">Переводы по FanCard (6767…) и Business Card (4242…)</div>
+            </div>
+            <div class="field">
+              <label id="trToLabel">Ник получателя</label>
+              <input id="trTo" placeholder="например: panda_bank" />
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="field"><label>Сумма</label><input id="trAmount" type="number" min="0" step="0.01" placeholder="например: 1500" /></div>
+            <div class="field">
+              <label>Валюта</label>
+              <select id="trCurrency"></select>
+              <div class="hint mono" id="trHint">—</div>
+            </div>
+          </div>
+
+          <div class="field"><label>Комментарий</label><input id="trComment" placeholder="необязательно" maxlength="64" /></div>
+
+          <div class="btns">
+            <button class="btn primary" id="btnSend" type="button">Отправить</button>
+            <button class="btn" data-nav="home" type="button">Назад</button>
+          </div>
+          <div class="hint mono" id="trPreview">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXCHANGE -->
+    <section class="screen" id="screen-exchange">
+      <div class="card">
+        <div class="cardHd"><h2>Обмен валют</h2><span class="tag">FX</span></div>
+        <div class="cardBd">
+          <div class="split">
+            <div class="field">
+              <label>Из</label>
+              <select id="exFrom"></select>
+            </div>
+            <div class="field">
+              <label>В</label>
+              <select id="exTo"></select>
+            </div>
+          </div>
+
+          <div class="split">
+            <div class="field">
+              <label>Сумма</label>
+              <input id="exAmount" type="number" min="0" step="0.01" placeholder="например: 1000" />
+              <div class="hint mono" id="exPreview">—</div>
+            </div>
+            <div class="field">
+              <label>Куда зачислить</label>
+              <select id="exAccount">
+                <option value="main" selected>Основной</option>
+              </select>
+              <div class="hint">Списываем с основного.</div>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="btn primary" id="btnExchange" type="button">Обменять</button>
+            <button class="btn" data-nav="home" type="button">Назад</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCOUNTS -->
+    <section class="screen" id="screen-accounts">
+      <div class="card">
+        <div class="cardHd">
+          <h2>Счета</h2>
+          <div class="btns">
+            <button class="btn small primary" id="btnCreateProduct" type="button">➕ Создать продукт</button>
+          </div>
+        </div>
+        <div class="cardBd">
+          <div class="list" id="accList"></div>
+          <div class="btns"><button class="btn" data-nav="home" type="button">Назад</button></div>
+          <div class="hint">Business Card создаётся здесь и появляется в карусели “Карты”. Остальные продукты — на главной.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARKET -->
+    <section class="screen" id="screen-market">
+      <div class="grid">
+        <div class="card">
+          <div class="cardHd"><h2>Маркет</h2><div class="btns"><button class="btn small tonal" id="btnReprice" type="button">🔄 Цены</button></div></div>
+          <div class="cardBd">
+            <div class="hint" id="marketDiscountHint" style="display:none"></div>
+            <div class="hint">Цены в USD, покупка — в домашней валюте.</div>
+            <div class="hr"></div>
+            <div class="list" id="marketList"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cardHd"><h2>Инвентарь</h2><span class="tag">моё</span></div>
+          <div class="cardBd"><div class="list" id="invList"></div><div class="hint" id="invEmpty" style="display:none">Пока пусто.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOP -->
+    <section class="screen" id="screen-top">
+      <div class="card">
+        <div class="cardHd"><h2>Топ</h2><div class="btns"><button class="btn small tonal" id="btnRecalcTop" type="button">🔄 Пересчитать</button></div></div>
+        <div class="cardBd"><div class="hint">Капитал в USD: деньги (все валюты) + инвентарь + депозит.</div><div class="hr"></div><div class="list" id="topList"></div></div>
+      </div>
+    </section>
+
+    <!-- WHAT'S NEW -->
+    <section class="screen" id="screen-whatsnew">
+      <div class="card">
+        <div class="cardHd">
+          <h2>Что нового</h2>
+          <span class="tag">changelog</span>
+        </div>
+        <div class="cardBd">
+          <div class="list" id="wnList"></div>
+          <div class="hr"></div>
+          <div class="btns">
+            <button class="btn tonal" id="btnMarkWhatsNewRead" type="button">Отметить как прочитано</button>
+            <button class="btn" data-nav="home" type="button">Назад</button>
+          </div>
+          <div class="hint">Это локально (в твоём браузере).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings">
+      <div class="card">
+        <div class="cardHd"><h2>Настройки</h2><span class="tag">PIN · avatar</span></div>
+        <div class="cardBd">
+          <div class="settingsGrid">
+            <div class="panel">
+              <div class="panelHd">
+                <b>Вход по PIN</b>
+                <span class="tag">4 цифры</span>
+              </div>
+              <div class="hint">Если PIN включен — приветствие попросит PIN перед входом.</div>
+              <div class="field">
+                <label>Новый PIN</label>
+                <input id="setPin" inputmode="numeric" maxlength="4" placeholder="например: 1234" />
+                <div class="hint">Оставь пустым и нажми “Сохранить”, чтобы отключить PIN.</div>
+              </div>
+              <div class="btns">
+                <button class="btn primary" id="btnSavePin" type="button">Сохранить</button>
+                <button class="btn tonal" id="btnDisablePin" type="button">Отключить</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panelHd">
+                <b>Аватар</b>
+                <span class="tag">local</span>
+              </div>
+              <div class="miniRow">
+                <div class="avatarPreview" id="avatarPreview">
+                  <span id="avatarPreviewText">FB</span>
+                  <img id="avatarPreviewImg" alt="preview"/>
+                </div>
+                <div style="min-width:0">
+                  <div class="hint" style="margin:0">Выбери картинку — она сохранится локально и будет видна в sidebar.</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Файл</label>
+                <div class="fileRow">
+                  <input id="avatarFile" class="fileHidden" type="file" accept="image/*" />
+                  <button class="fileBtn" id="avatarPickBtn" type="button">🖼️ Выбрать файл</button>
+                  <div class="fileName" id="avatarFileName">Файл не выбран</div>
+                </div>
+              </div>
+
+              <div class="btns">
+                <button class="btn primary" id="btnSaveAvatar" type="button">Сохранить</button>
+                <button class="btn" id="btnClearAvatar" type="button">Убрать</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <div class="btns">
+            <button class="btn" data-nav="home" type="button">Назад</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UI -->
+    <section class="screen" id="screen-ui">
+      <div class="card">
+        <div class="cardHd"><h2>Оформление</h2><span class="tag">UI</span></div>
+        <div class="cardBd">
+          <div class="btns">
+            <button class="btn tonal" id="btnThemeToggle" type="button">Переключить тему</button>
+            <button class="btn tonal" id="btnThemeLight2" type="button">Светлая</button>
+            <button class="btn tonal" id="btnThemeDark2" type="button">Тёмная</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="split">
+            <div class="field"><label>Скорость переливания фона</label><input id="setBgSpeed" type="range" min="8" max="40" value="18" /><div class="hint mono" id="setBgSpeedVal">18s</div></div>
+            <div class="field"><label>Сила искажения (blur)</label><input id="setWarp" type="range" min="8" max="48" value="22" /><div class="hint mono" id="setWarpVal">22px</div></div>
+          </div>
+
+          <div class="split">
+            <div class="field"><label>Зерно (grain)</label><input id="setGrain" type="range" min="0" max="20" value="8" /><div class="hint mono" id="setGrainVal">0.08</div></div>
+            <div class="field"><label>Стекло карточек</label><input id="setGlass" type="range" min="0" max="100" value="100" /><div class="hint mono" id="setGlassVal">1.00</div></div>
+          </div>
+
+          <div class="split">
+            <div class="field"><label>Скругление</label><input id="setRadius" type="range" min="12" max="28" value="20" /><div class="hint mono" id="setRadiusVal">20px</div></div>
+            <div class="field">
+              <label>Заставка “Добро пожаловать”</label>
+              <select id="setSplashMode">
+                <option value="always" selected>Всегда</option>
+                <option value="once">Один раз</option>
+                <option value="never">Никогда</option>
+              </select>
+              <div class="hint">Показывается только если ты вошёл.</div>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="btn primary" id="btnSaveUI" type="button">Сохранить</button>
+            <button class="btn" id="btnResetUI" type="button">Сбросить</button>
+            <button class="btn tonal" id="btnOpenSidebar" type="button">Открыть sidebar</button>
+            <button class="btn" data-nav="home" type="button">Назад</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="screen" id="screen-profile">
+      <div class="card">
+        <div class="cardHd"><h2>Профиль</h2><span class="tag">аккаунт</span></div>
+        <div class="cardBd">
+          <div class="split">
+            <div class="field"><label>Ник</label><input id="prNick" disabled /></div>
+            <div class="field">
+              <label>Страна</label>
+              <select id="prCountry"></select>
+            </div>
+          </div>
+          <div class="split">
+            <div class="field">
+              <label>Язык</label>
+              <select id="prLang"></select>
+            </div>
+            <div class="field"><label>&nbsp;</label><button class="btn primary" id="btnSaveProfile" type="button">Сохранить</button></div>
+          </div>
+          <div class="btns">
+            <button class="btn tonal" data-nav="ui" type="button">Оформление</button>
+            <button class="btn tonal" data-nav="settings" type="button">Настройки</button>
+            <button class="btn tonal" data-nav="whatsnew" type="button">🆕 Что нового</button>
+            <button class="btn tonal" id="btnOpenSidebar2" type="button">Sidebar</button>
+            <button class="btn" id="btnWipe" type="button">Сбросить всё (демо)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="screen" id="screen-admin">
+      <div class="card">
+        <div class="cardHd"><h2>Админ-панель</h2><span class="tag">Lunkes only</span></div>
+        <div class="cardBd">
+          <div class="settingsGrid" style="grid-template-columns:1fr 1fr; margin-bottom: 12px;">
+            <div class="panel">
+              <div class="panelHd"><b>KPI</b><span class="tag">stats</span></div>
+              <div class="list">
+                <div class="item"><div class="left"><div class="emoji">👥</div><div><div class="name">Пользователей</div><div class="sub">в базе</div></div></div><div class="price"><b class="mono" id="kpiUsers">—</b></div></div>
+                <div class="item"><div class="left"><div class="emoji">🧾</div><div><div class="name">Операций</div><div class="sub">всего</div></div></div><div class="price"><b class="mono" id="kpiTx">—</b></div></div>
+                <div class="item"><div class="left"><div class="emoji">💵</div><div><div class="name">Твой net worth</div><div class="sub">USD</div></div></div><div class="price"><b class="mono" id="kpiWorth">—</b></div></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panelHd"><b>Broadcast</b><span class="tag">toast</span></div>
+              <div class="field">
+                <label>Сообщение всем</label>
+                <textarea id="admMsg" placeholder="например: Сегодня скидки в маркете!"></textarea>
+              </div>
+              <div class="btns">
+                <button class="btn primary" id="btnAdmSendMsg" type="button">Отправить</button>
+                <button class="btn tonal" id="btnAdmClearMsg" type="button">Очистить</button>
+              </div>
+              <div class="hint">Покажется всем при следующем входе (localStorage).</div>
+            </div>
+          </div>
+
+          <div class="settingsGrid" style="grid-template-columns:1fr 1fr;">
+            <div class="panel">
+              <div class="panelHd"><b>Скидка</b><span class="tag">market</span></div>
+              <div class="split">
+                <div class="field"><label>% (0–90)</label><input id="admDiscPercent" type="number" min="0" max="90" step="1" placeholder="например: 25" /></div>
+                <div class="field"><label>Минут</label><input id="admDiscMins" type="number" min="1" max="10080" step="1" placeholder="например: 60" /></div>
+              </div>
+              <div class="btns">
+                <button class="btn primary" id="btnAdmStartDiscount" type="button">Запустить</button>
+                <button class="btn tonal" id="btnAdmStopDiscount" type="button">Остановить</button>
+              </div>
+              <div class="hint" id="admToolsState">—</div>
+            </div>
+
+            <div class="panel">
+              <div class="panelHd"><b>Верификация</b><span class="tag">check</span></div>
+              <div class="field">
+                <label>Пользователь</label>
+                <select id="admUserPick3"></select>
+              </div>
+              <div class="btns">
+                <button class="btn primary" id="btnAdmGiveCheck" type="button">Дать галочку</button>
+                <button class="btn tonal" id="btnAdmRemoveCheck" type="button">Убрать</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="settingsGrid" style="grid-template-columns:1fr 1fr;">
+            <div class="panel">
+              <div class="panelHd"><b>Деньги (self)</b><span class="tag">admin</span></div>
+              <div class="split">
+                <div class="field"><label>Начислить</label><input id="admSelfAdd" type="number" min="0" step="0.01" placeholder="100000" /></div>
+                <div class="field"><label>Списать</label><input id="admSelfSub" type="number" min="0" step="0.01" placeholder="5000" /></div>
+              </div>
+              <div class="btns">
+                <button class="btn primary" id="btnAdmSelfAdd" type="button">Начислить</button>
+                <button class="btn tonal" id="btnAdmSelfSub" type="button">Списать</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panelHd"><b>Пользователи</b><span class="tag">manage</span></div>
+              <div class="field">
+                <label>Выбрать</label>
+                <select id="admUserPick2"></select>
+              </div>
+              <div class="split">
+                <div class="field"><label>Выдать</label><input id="admUserGive" type="number" min="0" step="0.01" placeholder="1000" /></div>
+                <div class="field"><label>Забрать</label><input id="admUserTake" type="number" min="0" step="0.01" placeholder="500" /></div>
+              </div>
+              <div class="btns">
+                <button class="btn primary" id="btnAdmUserGive" type="button">Выдать</button>
+                <button class="btn tonal" id="btnAdmUserTake" type="button">Забрать</button>
+                <button class="btn tonal" id="btnAdmImpersonate" type="button">Войти как</button>
+                <button class="btn" id="btnAdmDeleteUser" type="button">Удалить</button>
+              </div>
+              <div class="hint" id="admUserInfo">—</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+          <div class="btns"><button class="btn" data-nav="home" type="button">Назад</button></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="nav" aria-label="Навигация">
+    <div class="navInner">
+      <div class="tab active" data-nav="home"><div class="ic">🏠</div><div class="tx">Главная</div></div>
+      <div class="tab" data-nav="market"><div class="ic">🛒</div><div class="tx">Маркет</div></div>
+      <div class="tab" data-nav="transfer"><div class="ic">💸</div><div class="tx">Перевод</div></div>
+      <div class="tab" data-nav="top"><div class="ic">🏆</div><div class="tx">Топ</div></div>
+      <div class="tab" data-nav="profile"><div class="ic">👤</div><div class="tx">Профиль</div></div>
+    </div>
+  </nav>
+
+<script>
+(() => {
+  const ADMIN_NICK = "Lunkes";
+
+  // NEW: What's new
+  const WHATSNEW_KEY = "funbank.whatsnew.seen.v1";
+  const WHATS_NEW = [
+    { at: "2026-01-03", title: "🆕 Экран «Что нового»", text: "Добавлен экран с мини-изменениями/заметками (локально)." },
+    { at: "2026-01-03", title: "✅ Галочка ближе к нику", text: "Иконка верификации теперь плотнее к нику." },
+    { at: "2026-01-03", title: "🧾 Операции: список не ломает верстку", text: "Список операций получил скролл и фиксы overflow." },
+  ];
+
+  const COUNTRIES = [
+    { code:"RU", name:"Россия", lang:"ru", language:"Русский", currency:{ code:"RUB", symbol:"₽", name:"Рублик" } },
+    { code:"US", name:"США", lang:"en", language:"English", currency:{ code:"USD", symbol:"$", name:"Dollaro" } },
+    { code:"CN", name:"Китай", lang:"zh", language:"中文", currency:{ code:"CNY", symbol:"¥", name:"Yuano" } },
+    { code:"JP", name:"Япония", lang:"ja", language:"日本語", currency:{ code:"JPY", symbol:"¥", name:"Yeno" } },
+    { code:"DE", name:"Германия", lang:"de", language:"Deutsch", currency:{ code:"EUR", symbol:"€", name:"Euryo" } },
+    { code:"FR", name:"Франция", lang:"fr", language:"Français", currency:{ code:"EUR", symbol:"€", name:"Euryo" } },
+    { code:"GB", name:"Великобритания", lang:"en-GB", language:"English (UK)", currency:{ code:"GBP", symbol:"£", name:"Poundy" } },
+    { code:"IN", name:"Индия", lang:"hi", language:"हिन्दी", currency:{ code:"INR", symbol:"₹", name:"Rupeyo" } },
+    { code:"BR", name:"Бразилия", lang:"pt-BR", language:"Português (BR)", currency:{ code:"BRL", symbol:"R$", name:"Realo" } },
+    { code:"TR", name:"Турция", lang:"tr", language:"Türkçe", currency:{ code:"TRY", symbol:"₺", name:"Liro" } },
+  ];
+
+  const RATE_TO_USD = { USD:1.00, EUR:1.08, GBP:1.26, CNY:0.14, JPY:0.0068, RUB:0.011, INR:0.012, BRL:0.20, TRY:0.033 };
+
+  const MARKET_ITEMS = [
+    { id:"itm_coffee", name:"Кофе", emoji:"☕️", baseUSD:3.5, rarity:"common" },
+    { id:"itm_burger", name:"Бургер", emoji:"🍔", baseUSD:7.0, rarity:"common" },
+    { id:"itm_headphones", name:"Наушники", emoji:"🎧", baseUSD:49, rarity:"uncommon" },
+    { id:"itm_watch", name:"Часы", emoji:"⌚️", baseUSD:120, rarity:"uncommon" },
+    { id:"itm_phone", name:"Телефон", emoji:"📱", baseUSD:699, rarity:"rare" },
+    { id:"itm_laptop", name:"Ноутбук", emoji:"💻", baseUSD:899, rarity:"rare" },
+    { id:"itm_art", name:"Арт", emoji:"🖼️", baseUSD:1500, rarity:"epic" },
+    { id:"itm_rocket", name:"Ракета (макет)", emoji:"🚀", baseUSD:5200, rarity:"epic" },
+    { id:"itm_gem", name:"Самоцвет", emoji:"💎", baseUSD:8900, rarity:"legendary" },
+  ];
+
+  // сохранение аккаунтов НЕ трогаем
+  const STORAGE_KEY = "funbank.db";
+  const UI_KEY = "funbank.ui.v6";
+  const ANNOUNCE_KEY = "funbank.announcement";
+
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+  function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+  function uid(){ return Math.random().toString(16).slice(2) + "-" + Math.random().toString(16).slice(2); }
+  function now(){ return Date.now(); }
+  function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+
+  function currencyByCode(code){
+    const base = {
+      USD:{code:"USD",symbol:"$",name:"Dollaro"},
+      EUR:{code:"EUR",symbol:"€",name:"Euryo"},
+      GBP:{code:"GBP",symbol:"£",name:"Poundy"},
+      CNY:{code:"CNY",symbol:"¥",name:"Yuano"},
+      JPY:{code:"JPY",symbol:"¥",name:"Yeno"},
+      RUB:{code:"RUB",symbol:"₽",name:"Рублик"},
+      INR:{code:"INR",symbol:"₹",name:"Rupeyo"},
+      BRL:{code:"BRL",symbol:"R$",name:"Realo"},
+      TRY:{code:"TRY",symbol:"₺",name:"Liro"},
+    };
+    return base[code] || {code, symbol:code, name:code};
+  }
+
+  function fmtMoney(amount, currencyCode){
+    const cur = currencyByCode(currencyCode);
+    const a = Number(amount || 0);
+    const s = (Math.round(a * 100) / 100).toFixed(2);
+    const [i,d] = s.split(".");
+    const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return `${grouped}.${d} ${cur.symbol}`.trim();
+  }
+  function toUSD(amount, currencyCode){ const r = RATE_TO_USD[currencyCode]; return r ? amount * r : 0; }
+  function fromUSD(usd, currencyCode){ const r = RATE_TO_USD[currencyCode]; return r ? usd / r : 0; }
+  function convert(amount, from, to){ return fromUSD(toUSD(amount, from), to); }
+
+  function toast(title, msg){
+    const wrap = $("#toasts");
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.innerHTML = `<b>${escapeHtml(title)}</b><small>${escapeHtml(msg)}</small>`;
+    wrap.appendChild(el);
+    setTimeout(()=>{ el.style.transition="all 220ms var(--easeStd)"; el.style.opacity="0"; el.style.transform="translateY(-6px)"; }, 2300);
+    setTimeout(()=> el.remove(), 2600);
+  }
+
+  function tabTransitionFx(){
+    const fx = $("#tabFx");
+    fx.classList.remove("show");
+    void fx.offsetWidth;
+    fx.classList.add("show");
+  }
+
+  function defaultDB(){
+    return {
+      users:{},
+      session:{nick:null},
+      market:{ items: MARKET_ITEMS.map(x => ({...x, priceUSD:x.baseUSD})) },
+      marketDiscount: { active:false, percent:0, until:0 },
+      cardIndex: {}
+    };
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultDB();
+      const db = JSON.parse(raw);
+      if (!db.users) db.users = {};
+      if (!db.session) db.session = {nick:null};
+      if (!db.market?.items) db.market = defaultDB().market;
+      if (!db.marketDiscount) db.marketDiscount = { active:false, percent:0, until:0 };
+      if (!db.cardIndex) db.cardIndex = {};
+      return db;
+    }catch{
+      return defaultDB();
+    }
+  }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  let state = load();
+
+  function loadUI(){
+    try{
+      const raw = localStorage.getItem(UI_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    }catch{ return null; }
+  }
+  function saveUI(ui){ localStorage.setItem(UI_KEY, JSON.stringify(ui)); }
+
+  function applyUI(ui){
+    const root = document.documentElement.style;
+    if (typeof ui.bgSpeed === "number") root.setProperty("--bgSpeed", ui.bgSpeed + "s");
+    if (typeof ui.warpStrength === "number") root.setProperty("--warpStrength", ui.warpStrength + "px");
+    if (typeof ui.grainOpacity === "number") root.setProperty("--grainOpacity", ui.grainOpacity.toFixed(2));
+    if (typeof ui.glass === "number") root.setProperty("--glass", ui.glass.toFixed(2));
+    if (typeof ui.radius === "number") root.setProperty("--radius", ui.radius + "px");
+    if (ui.theme === "dark" || ui.theme === "light") document.body.setAttribute("data-theme", ui.theme);
+    const splashSel = $("#setSplashMode");
+    if (ui.splashMode && splashSel) splashSel.value = ui.splashMode;
+  }
+
+  function uiFromInputs(){
+    const bgSpeed = Number($("#setBgSpeed").value);
+    const warpStrength = Number($("#setWarp").value);
+    const grainOpacity = Number($("#setGrain").value) / 100;
+    const glass = Number($("#setGlass").value) / 100;
+    const radius = Number($("#setRadius").value);
+    const splashMode = $("#setSplashMode").value;
+    return { bgSpeed, warpStrength, grainOpacity, glass, radius, splashMode };
+  }
+  function updateUIReadouts(ui){
+    $("#setBgSpeedVal").textContent = ui.bgSpeed + "s";
+    $("#setWarpVal").textContent = ui.warpStrength + "px";
+    $("#setGrainVal").textContent = ui.grainOpacity.toFixed(2);
+    $("#setGlassVal").textContent = ui.glass.toFixed(2);
+    $("#setRadiusVal").textContent = ui.radius + "px";
+  }
+  function setTheme(theme){
+    document.body.setAttribute("data-theme", theme);
+    const ui = loadUI() || {};
+    ui.theme = theme;
+    saveUI(ui);
+  }
+
+  function currentUser(){
+    const n = state.session.nick;
+    return n ? state.users[n] || null : null;
+  }
+  function isAdmin(u){ return !!u && u.nick === ADMIN_NICK; }
+
+  function randomCardNumber(prefix){
+    let digits = String(prefix);
+    for (let i=0;i<12;i++) digits += String(Math.floor(Math.random()*10));
+    return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
+  }
+  function normalizeCardNumber(s){
+    return String(s || "").replace(/[^\d]/g, "").replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+  }
+  function generateUniqueCard(prefix){
+    for (let i=0;i<2000;i++){
+      const num = randomCardNumber(prefix);
+      if (!state.cardIndex[num]) return num;
+    }
+    return randomCardNumber(prefix);
+  }
+  function registerCardToIndex(cardNumber, nick){ state.cardIndex[cardNumber] = nick; }
+  function findUserByCard(cardNumber){
+    const key = normalizeCardNumber(cardNumber);
+    const nick = state.cardIndex[key];
+    if (!nick) return null;
+    return state.users[nick] || null;
+  }
+
+  function hashPassword(pw){
+    let h = 2166136261;
+    const s = String(pw||"");
+    for (let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h>>>0).toString(16);
+  }
+  function pickBonus(kind, homeCC){
+    const baseUSD = kind==="small" ? 80 : kind==="rich" ? 1200 : 300;
+    return fromUSD(baseUSD, homeCC);
+  }
+
+  function ensureUser(u){
+    if (!u.accounts) u.accounts = {};
+    if (!u.accounts.main) u.accounts.main = { balances:{} };
+    if (!u.products) u.products = [];
+    if (!u.deposit) u.deposit = { open:false, currencyCode:null, balance:0, openedAt:0, maturesAt:0 };
+    if (!u.txs) u.txs = [];
+    if (!u.inventory) u.inventory = {};
+    if (!u.profile) u.profile = { avatarDataUrl:null, pinHash:null };
+    if (!u.card){
+      u.card = { number: generateUniqueCard("6767"), exp:"12/30" };
+      registerCardToIndex(u.card.number, u.nick);
+    }
+    if (u.verified == null) u.verified = (u.nick === ADMIN_NICK);
+    if (!u.products.some(p => p.type === "card")){
+      u.products.unshift({ id:"prod_card", type:"card", title:"FanCard", createdAt: now() });
+    }
+    if (u.bizCard && !u.products.some(p => p.type === "bizcard")){
+      u.products.push({ id:"prod_bizcard", type:"bizcard", title:"Business Card", createdAt: now() });
+      registerCardToIndex(u.bizCard.number, u.nick);
+    }
+  }
+
+  function homeCurrencyCode(u){
+    const c = COUNTRIES.find(x=>x.code===u.countryCode) || COUNTRIES[0];
+    return c.currency.code;
+  }
+  function addBal(u, cc, delta){
+    ensureUser(u);
+    const b = u.accounts.main.balances;
+    const prev = Number(b[cc] || 0);
+    b[cc] = Math.round((prev + delta) * 100) / 100;
+  }
+  function getBal(u, cc){
+    ensureUser(u);
+    return Number(u.accounts.main.balances[cc] || 0);
+  }
+  function pushTx(u, tx){
+    ensureUser(u);
+    u.txs.unshift(tx);
+    u.txs = u.txs.slice(0, 60);
+  }
+
+  function discountActive(){
+    const d = state.marketDiscount;
+    if (!d.active) return false;
+    if (now() >= d.until){ d.active = false; d.percent = 0; d.until = 0; save(); return false; }
+    return true;
+  }
+  function discountedPriceUSD(baseUSD){
+    if (!discountActive()) return baseUSD;
+    const p = clamp(Number(state.marketDiscount.percent || 0), 0, 90);
+    return baseUSD * (1 - p/100);
+  }
+  function discountHintText(){
+    if (!discountActive()) return "";
+    const leftMs = state.marketDiscount.until - now();
+    const leftMin = Math.max(0, Math.ceil(leftMs / 60000));
+    return `Скидка в маркете: -${state.marketDiscount.percent}% · осталось ~${leftMin} мин`;
+  }
+
+  function userBadgeHTML(u){
+    if (!u?.verified) return "";
+    return ` <span class="verifyBadge" title="Верификация" aria-label="Верификация"></span>`;
+  }
+
+  function fillSelects(){
+    const cOpts = COUNTRIES.map(c => `<option value="${c.code}">${escapeHtml(c.name)} · ${escapeHtml(c.currency.symbol)} (${escapeHtml(c.currency.name)})</option>`).join("");
+    $("#regCountry").innerHTML = cOpts;
+    $("#prCountry").innerHTML = cOpts;
+
+    const lOpts = COUNTRIES.map(c => `<option value="${c.lang}">${escapeHtml(c.language)} (${escapeHtml(c.name)})</option>`).join("");
+    $("#regLang").innerHTML = lOpts;
+    $("#prLang").innerHTML = lOpts;
+
+    const curCodes = Object.keys(RATE_TO_USD);
+    const curOpts = curCodes.map(code => {
+      const cur = currencyByCode(code);
+      return `<option value="${code}">${escapeHtml(cur.symbol)} ${escapeHtml(cur.name)} (${code})</option>`;
+    }).join("");
+    $("#trCurrency").innerHTML = curOpts;
+    $("#exFrom").innerHTML = curOpts;
+    $("#exTo").innerHTML = curOpts;
+  }
+
+  function openSidebar(){ $("#sbBackdrop").classList.add("show"); $("#sidebar").classList.add("show"); }
+  function closeSidebar(){ $("#sbBackdrop").classList.remove("show"); $("#sidebar").classList.remove("show"); }
+
+  function openSheet(){
+    $("#sheetBackdrop").classList.add("show");
+    $("#sheet").classList.add("show");
+  }
+  function closeSheet(){
+    $("#sheetBackdrop").classList.remove("show");
+    $("#sheet").classList.remove("show");
+  }
+
+  function updateAvatarUI(u){
+    const img = $("#sbAvatarImg");
+    const txt = $("#sbAvatarText");
+    if (u?.profile?.avatarDataUrl){
+      img.src = u.profile.avatarDataUrl;
+      img.style.display = "block";
+      txt.style.display = "none";
+    }else{
+      img.removeAttribute("src");
+      img.style.display = "none";
+      txt.style.display = "block";
+      txt.textContent = (u?.nick ? u.nick.slice(0,2).toUpperCase() : "FB");
+    }
+
+    const pImg = $("#avatarPreviewImg");
+    const pTxt = $("#avatarPreviewText");
+    if (pImg && pTxt){
+      if (u?.profile?.avatarDataUrl){
+        pImg.src = u.profile.avatarDataUrl;
+        pImg.style.display = "block";
+        pTxt.style.display = "none";
+      }else{
+        pImg.removeAttribute("src");
+        pImg.style.display = "none";
+        pTxt.style.display = "block";
+        pTxt.textContent = (u?.nick ? u.nick.slice(0,2).toUpperCase() : "FB");
+      }
+    }
+  }
+
+  function updateSidebar(){
+    const u = currentUser();
+    if (!u){
+      $("#sbNick").textContent = "Гость";
+      $("#sbMeta").textContent = "Войдите, чтобы открыть функции";
+      updateAvatarUI(null);
+      $("#sbAdminItem").style.display = "none";
+      return;
+    }
+    ensureUser(u);
+    $("#sbNick").innerHTML = escapeHtml(u.nick) + (u.verified ? userBadgeHTML(u) : "");
+    const homeCC = homeCurrencyCode(u);
+    $("#sbMeta").textContent = `FanCard: ${u.card.number} · Баланс: ${fmtMoney(getBal(u,homeCC), homeCC)}`;
+    updateAvatarUI(u);
+    $("#sbAdminItem").style.display = isAdmin(u) ? "flex" : "none";
+  }
+
+  function updateChip(){
+    const u = currentUser();
+    if (!u){
+      $("#chipTitle").textContent = "Гость";
+      $("#chipSub").textContent = "нажми, чтобы открыть sidebar";
+      $("#dot").style.background = "#f59e0b";
+      $("#dot").style.boxShadow = "0 0 0 4px rgba(245,158,11,.15)";
+      updateSidebar();
+      return;
+    }
+    ensureUser(u);
+    const c = COUNTRIES.find(x=>x.code===u.countryCode);
+    $("#chipTitle").innerHTML = escapeHtml(u.nick) + (u.verified ? userBadgeHTML(u) : "");
+    $("#chipSub").textContent = `${c?.name || "—"} · меню`;
+    $("#dot").style.background = "var(--green)";
+    $("#dot").style.boxShadow = "0 0 0 4px rgba(34,197,94,.18)";
+    updateSidebar();
+  }
+
+  function screenEl(id){ return document.getElementById("screen-"+id); }
+  function go(id){
+    const u = currentUser();
+    if (id === "admin" && !isAdmin(u)){
+      toast("Доступ", "Админ-панель доступна только Lunkes.");
+      id = "home";
+    }
+    if (!u && id !== "auth" && id !== "ui") id = "auth";
+
+    tabTransitionFx();
+    $$(".screen").forEach(s => s.classList.remove("active","enter"));
+    screenEl(id).classList.add("active","enter");
+    $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.nav === id));
+    closeSidebar();
+    render();
+  }
+
+  function maybeAnnouncement(){
+    try{
+      const raw = localStorage.getItem(ANNOUNCE_KEY);
+      if (!raw) return;
+      const a = JSON.parse(raw);
+      if (!a || !a.text) return;
+      const seenKey = "funbank.announce.seen." + (a.id || "0");
+      if (localStorage.getItem(seenKey) === "1") return;
+      localStorage.setItem(seenKey, "1");
+      toast("Сообщение", a.text);
+    }catch{}
+  }
+
+  function accountUSDFromBalances(balances){
+    let usd = 0;
+    for (const [cc, amt] of Object.entries(balances || {})){
+      usd += toUSD(Number(amt || 0), cc);
+    }
+    return usd;
+  }
+  function inventoryUSD(u){
+    let usd = 0;
+    for (const [itemId, qty] of Object.entries(u.inventory || {})){
+      const it = state.market.items.find(x => x.id === itemId);
+      if (!it) continue;
+      usd += Number(qty || 0) * Number(it.priceUSD || 0);
+    }
+    return usd;
+  }
+  function netWorthUSD(u){
+    ensureUser(u);
+    let usd = 0;
+    usd += accountUSDFromBalances(u.accounts.main?.balances || {});
+    usd += inventoryUSD(u);
+    if (u.deposit?.open){
+      usd += toUSD(Number(u.deposit.balance || 0), u.deposit.currencyCode);
+    }
+    return usd;
+  }
+
+  function bindPrettyFile(inputId, btnId, nameId){
+    const inp = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    const name = document.getElementById(nameId);
+    if (!inp || !btn || !name) return;
+
+    btn.addEventListener("click", () => inp.click());
+    inp.addEventListener("change", () => {
+      const file = inp.files && inp.files[0];
+      name.textContent = file ? file.name : "Файл не выбран";
+    });
+  }
+
+  /* ===== PIN helpers ===== */
+  function hashPin(pin){ return hashPassword("pin:" + String(pin||"")); }
+  function pinEnabled(u){ return !!u?.profile?.pinHash; }
+
+  let splashTimer = null;
+  function updatePinDots(pin){
+    const dots = Array.from($("#pinDots").children);
+    dots.forEach((d,i) => d.classList.toggle("filled", i < pin.length));
+  }
+
+  function showSplashForUser(nick){
+    $("#splashWelcome").innerHTML = `Добро пожаловать в FunBank <span class="mono">${escapeHtml(nick)}</span>!<small>приятного пользования</small>`;
+    const el = $("#splash");
+    el.classList.add("show");
+    el.classList.remove("brighten");
+
+    const u = currentUser();
+    if (u && pinEnabled(u)){
+      $("#pinBox").style.display = "flex";
+      $("#pinInput").value = "";
+      updatePinDots("");
+      $("#pinHint").textContent = "PIN включён. Введи 4 цифры, чтобы продолжить.";
+      if (splashTimer){ clearTimeout(splashTimer); splashTimer = null; }
+      return;
+    }else{
+      $("#pinBox").style.display = "none";
+    }
+
+    splashTimer = setTimeout(() => {
+      el.classList.add("brighten");
+      setTimeout(() => el.classList.remove("show"), 920);
+    }, 5000);
+  }
+
+  function closeSplash(){
+    const el = $("#splash");
+    $("#pinBox").style.display = "none";
+    el.classList.remove("show");
+    el.classList.remove("brighten");
+  }
+
+  function verifyPinAndContinue(){
+    const u = currentUser();
+    if (!u || !pinEnabled(u)){
+      $("#pinBox").style.display = "none";
+      return;
+    }
+    const pin = ($("#pinInput").value || "").trim();
+    if (!/^\d{4}$/.test(pin)){
+      $("#pinHint").textContent = "Нужно ровно 4 цифры.";
+      return;
+    }
+    if (hashPin(pin) !== u.profile.pinHash){
+      $("#pinHint").textContent = "Неверный PIN.";
+      $("#pinInput").value = "";
+      updatePinDots("");
+      return;
+    }
+    const el = $("#splash");
+    $("#pinBox").style.display = "none";
+    el.classList.add("brighten");
+    setTimeout(() => el.classList.remove("show"), 920);
+  }
+
+  function maybeSplashOnLogin(){
+    const u = currentUser();
+    if (!u) return;
+    const ui = loadUI() || { splashMode:"always" };
+    const mode = ui.splashMode || "always";
+    const onceKey = "funbank.splash.once.done." + u.nick;
+    if (mode === "never") return;
+    if (mode === "once" && localStorage.getItem(onceKey) === "1") return;
+    showSplashForUser(u.nick);
+    if (mode === "once") localStorage.setItem(onceKey, "1");
+  }
+
+  // NEW: What's new render + unread marker (uses its own key, doesn't touch accounts db)
+  function whatsNewUnread(){
+    const seen = localStorage.getItem(WHATSNEW_KEY);
+    return seen !== "1";
+  }
+  function markWhatsNewRead(){
+    localStorage.setItem(WHATSNEW_KEY, "1");
+    toast("Что нового", "Отмечено как прочитано.");
+    renderSidebarBadges();
+  }
+  function renderWhatsNew(){
+    const list = $("#wnList");
+    if (!list) return;
+    list.innerHTML = WHATS_NEW.map(x => `
+      <div class="item">
+        <div class="left">
+          <div class="emoji">🆕</div>
+          <div style="min-width:0">
+            <div class="name">${escapeHtml(x.title)}</div>
+            <div class="sub">${escapeHtml(x.at)} · ${escapeHtml(x.text)}</div>
+          </div>
+        </div>
+        <span class="tag">log</span>
+      </div>
+    `).join("");
+  }
+  function renderSidebarBadges(){
+    // simple: change tag text for "Что нового"
+    const el = $(`.sbItem[data-nav="whatsnew"] .tag`);
+    if (!el) return;
+    el.textContent = whatsNewUnread() ? "new" : "ok";
+  }
+
+  function renderHome(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    const homeCC = homeCurrencyCode(u);
+    const main = getBal(u, homeCC);
+    const usd = toUSD(main, homeCC);
+
+    $("#mainBalance").textContent = fmtMoney(main, homeCC);
+    $("#mainHint").textContent = `≈ ${fmtMoney(usd, "USD")} · (демо-курс)`;
+
+    $("#cardNumber").textContent = u.card.number;
+    $("#cardHolder").textContent = u.nick;
+    $("#cardExp").textContent = "EXP " + (u.card.exp || "12/30");
+
+    const hasBiz = !!u.bizCard?.number;
+    $("#bizSlide").style.display = hasBiz ? "" : "none";
+    if (hasBiz){
+      $("#bizCardNumber").textContent = u.bizCard.number;
+      $("#bizCardHolder").textContent = u.nick + " LLC";
+      $("#bizCardExp").textContent = "EXP " + (u.bizCard.exp || "12/30");
+    }
+
+    const c = COUNTRIES.find(x=>x.code===u.countryCode);
+    $("#who").textContent = `${u.nick} · ${c?.name || "—"}`;
+    $("#who2").textContent = `Язык: ${u.langCode} · Дом. валюта: ${currencyByCode(homeCC).symbol} (${homeCC})`;
+
+    const sample = 1000;
+    $("#fxLine").textContent = `${sample.toFixed(0)} ${currencyByCode(homeCC).symbol} ≈ ${convert(sample, homeCC, "USD").toFixed(2)} $`;
+
+    // products list
+    const pl = $("#homeProductsList");
+    const products = [];
+
+    if (u.deposit?.open){
+      const ready = now() >= u.deposit.maturesAt;
+      products.push({
+        icon: ready ? "🏁" : "🏦",
+        title: "Вклад",
+        sub: `Сумма: ${fmtMoney(u.deposit.balance, u.deposit.currencyCode)} · ${ready ? "готов к закрытию" : "в процессе"}`
+      });
+    }
+
+    const custom = (u.products || []).filter(p => !["card","bizcard"].includes(p.type));
+    for (const p of custom.slice(0, 20)){
+      products.push({
+        icon: p.type === "mortgage" ? "🏠" : p.type === "account" ? "💳" : "✨",
+        title: p.title || "Продукт",
+        sub: `Создан: ${new Date(p.createdAt || now()).toLocaleString()}`
+      });
+    }
+
+    if (!products.length){
+      $("#homeProductsEmpty").style.display = "block";
+      pl.innerHTML = "";
+    }else{
+      $("#homeProductsEmpty").style.display = "none";
+      pl.innerHTML = products.map(p => `
+        <div class="item">
+          <div class="left">
+            <div class="emoji">${escapeHtml(p.icon)}</div>
+            <div style="min-width:0">
+              <div class="name">${escapeHtml(p.title)}</div>
+              <div class="sub">${escapeHtml(p.sub)}</div>
+            </div>
+          </div>
+          <span class="tag">info</span>
+        </div>
+      `).join("");
+    }
+
+    // tx list
+    const list = $("#txList");
+    list.innerHTML = "";
+    const txs = u.txs || [];
+    $("#txEmpty").style.display = txs.length ? "none" : "block";
+
+    for (const tx of txs.slice(0, 40)){
+      const icon = ({
+        transfer_out:"📤", transfer_in:"📥",
+        exchange:"💱", buy:"🛒", sell:"💰", bonus:"🎁", deposit_open:"🏦", deposit_close:"🏁",
+        product:"✨", bizcard:"🏢", admin:"🛡️"
+      }[tx.kind] || "🧾");
+
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div class="left">
+          <div class="emoji">${icon}</div>
+          <div style="min-width:0">
+            <div class="name">${escapeHtml(tx.title || "Операция")}</div>
+            <div class="sub">${escapeHtml(new Date(tx.at || now()).toLocaleString())}${tx.note ? " · " + escapeHtml(tx.note) : ""}</div>
+          </div>
+        </div>
+        <div class="price">
+          <b class="mono" style="font-weight:950; max-width: 100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            ${escapeHtml(tx.sign||"")}${escapeHtml(fmtMoney(tx.amount||0, tx.currencyCode || homeCC))}
+          </b>
+          <small class="sub mono" style="max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            ${tx.usd != null ? "≈ " + escapeHtml(fmtMoney(tx.usd, "USD")) : ""}
+          </small>
+        </div>
+      `;
+      list.appendChild(el);
+    }
+  }
+
+  function renderTransfer(){
+    const u = currentUser(); if (!u) return;
+    const homeCC = homeCurrencyCode(u);
+    $("#trCurrency").value = homeCC;
+    updateTransferUI();
+    updateTransferHint();
+    updateTransferPreview();
+  }
+
+  function updateTransferUI(){
+    const mode = $("#trMode").value;
+    $("#trToLabel").textContent = mode === "card" ? "Номер карты" : "Ник получателя";
+    $("#trTo").placeholder = mode === "card" ? "например: 6767 1234 5678 9012" : "например: panda_bank";
+  }
+
+  function updateTransferHint(){
+    const u = currentUser(); if (!u) return;
+    const cc = $("#trCurrency").value;
+    const bal = getBal(u, cc);
+    $("#trHint").textContent = `Доступно: ${fmtMoney(bal, cc)} (≈ ${fmtMoney(toUSD(bal,cc),"USD")})`;
+  }
+
+  function updateTransferPreview(){
+    const u = currentUser(); if (!u) return;
+    const mode = $("#trMode").value;
+    const toRaw = ($("#trTo").value || "").trim();
+    const amt = Number($("#trAmount").value || 0);
+    const fromCC = $("#trCurrency").value;
+
+    let r = null;
+    if (mode === "nick"){
+      r = state.users[toRaw] || null;
+    }else{
+      r = findUserByCard(toRaw);
+    }
+
+    const outEl = $("#trPreview");
+    if (!r){
+      outEl.textContent = "Получатель не найден (проверь ник/карту).";
+      return;
+    }
+    ensureUser(r);
+    const toCC = homeCurrencyCode(r);
+    if (!(amt > 0)){
+      outEl.textContent = `Получатель: ${r.nick} · получит в ${toCC}.`;
+      return;
+    }
+    const usd = toUSD(amt, fromCC);
+    const out = convert(amt, fromCC, toCC);
+    outEl.textContent = `Получатель: ${r.nick} · отправишь ${fmtMoney(amt, fromCC)} (≈ ${fmtMoney(usd,"USD")}), он получит ≈ ${fmtMoney(out, toCC)}.`;
+  }
+
+  function renderExchange(){
+    const u = currentUser(); if (!u) return;
+    const homeCC = homeCurrencyCode(u);
+    $("#exFrom").value = homeCC;
+    $("#exTo").value = "USD";
+    previewExchange();
+  }
+
+  function previewExchange(){
+    const from = $("#exFrom").value;
+    const to = $("#exTo").value;
+    const amt = Number($("#exAmount").value || 0);
+    const out = convert(amt, from, to);
+    $("#exPreview").textContent = `${amt.toFixed(2)} ${currencyByCode(from).symbol} → ${out.toFixed(2)} ${currencyByCode(to).symbol}`;
+  }
+
+  function renderAccounts(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    const homeCC = homeCurrencyCode(u);
+    const list = $("#accList");
+    list.innerHTML = "";
+
+    const balances = Object.entries(u.accounts.main?.balances || {})
+      .filter(([,v]) => Math.abs(Number(v||0)) > 1e-9)
+      .sort((a,b)=> toUSD(Number(b[1]||0), b[0]) - toUSD(Number(a[1]||0), a[0]));
+
+    const mainEl = document.createElement("div");
+    mainEl.className = "item";
+    mainEl.innerHTML = `
+      <div class="left">
+        <div class="emoji">💳</div>
+        <div style="min-width:0">
+          <div class="name">Основной счёт</div>
+          <div class="sub">${balances.length ? balances.slice(0,4).map(([cc,amt]) => `${fmtMoney(amt,cc)}`).join(" · ") : "Пока пусто"}${balances.length>4 ? " · ..." : ""}</div>
+        </div>
+      </div>
+      <span class="tag">≈ ${fmtMoney(toUSD(getBal(u,homeCC),homeCC),"USD")}</span>
+    `;
+    list.appendChild(mainEl);
+
+    const dep = u.deposit;
+    const depEl = document.createElement("div");
+    depEl.className = "item";
+    if (!dep.open){
+      depEl.innerHTML = `
+        <div class="left"><div class="emoji">🏦</div><div><div class="name">Вклад</div><div class="sub">Нет активного вклада</div></div></div>
+        <span class="tag">7 дней · +3%</span>
+      `;
+    } else {
+      const ready = now() >= dep.maturesAt;
+      depEl.innerHTML = `
+        <div class="left"><div class="emoji">${ready ? "🏁" : "⏳"}</div><div><div class="name">Вклад активен</div><div class="sub">Сумма: <span class="mono">${escapeHtml(fmtMoney(dep.balance, dep.currencyCode))}</span></div></div></div>
+        <div class="btns"><button class="btn small primary" id="btnCloseDeposit" ${ready ? "" : "disabled"} type="button">Закрыть (+3%)</button></div>
+      `;
+    }
+    list.appendChild(depEl);
+    const btn = depEl.querySelector("#btnCloseDeposit");
+    if (btn) btn.addEventListener("click", closeDeposit);
+
+    const bizEl = document.createElement("div");
+    bizEl.className = "item";
+    if (!u.bizCard){
+      bizEl.innerHTML = `
+        <div class="left"><div class="emoji">🏢</div><div><div class="name">Business Card</div><div class="sub">Не создана</div></div></div>
+        <span class="tag">4242…</span>
+      `;
+    } else {
+      bizEl.innerHTML = `
+        <div class="left"><div class="emoji">🏢</div><div><div class="name">Business Card</div><div class="sub mono">${escapeHtml(u.bizCard.number)}</div></div></div>
+        <span class="tag">активна</span>
+      `;
+    }
+    list.appendChild(bizEl);
+  }
+
+  function renderMarket(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+
+    const hint = $("#marketDiscountHint");
+    const txt = discountHintText();
+    hint.style.display = txt ? "block" : "none";
+    hint.textContent = txt;
+
+    const homeCC = homeCurrencyCode(u);
+    const list = $("#marketList");
+    list.innerHTML = "";
+
+    for (const it of state.market.items){
+      const effectiveUSD = discountedPriceUSD(it.priceUSD);
+      const priceHome = fromUSD(effectiveUSD, homeCC);
+      const badge = discountActive()
+        ? `<small class="sub mono">было ${it.priceUSD.toFixed(2)} $</small>`
+        : `<small class="sub mono">≈ ${it.priceUSD.toFixed(2)} $</small>`;
+
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div class="left"><div class="emoji">${escapeHtml(it.emoji)}</div><div style="min-width:0"><div class="name">${escapeHtml(it.name)}</div>${badge}</div></div>
+        <div class="price">
+          <b class="mono" style="font-weight:950">${escapeHtml(fmtMoney(priceHome, homeCC))}</b>
+          <small class="sub mono">≈ ${effectiveUSD.toFixed(2)} $</small>
+          <div class="btns" style="justify-content:flex-end"><button class="btn small primary" data-buy="${it.id}" type="button">Купить</button></div>
+        </div>
+      `;
+      list.appendChild(el);
+    }
+    list.querySelectorAll("button[data-buy]").forEach(b => b.addEventListener("click", () => buyItem(b.dataset.buy)));
+    renderInventory();
+  }
+
+  function renderInventory(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+
+    const homeCC = homeCurrencyCode(u);
+    const inv = Object.entries(u.inventory).filter(([,q]) => Number(q) > 0);
+
+    const list = $("#invList");
+    list.innerHTML = "";
+    $("#invEmpty").style.display = inv.length ? "none" : "block";
+
+    for (const [itemId, qty] of inv){
+      const it = state.market.items.find(x=>x.id===itemId);
+      if (!it) continue;
+
+      const sellUSD = it.priceUSD * 0.85;
+      const sellHome = fromUSD(sellUSD, homeCC);
+
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div class="left"><div class="emoji">${escapeHtml(it.emoji)}</div><div style="min-width:0"><div class="name">${escapeHtml(it.name)} <span class="tag">x${escapeHtml(qty)}</span></div><div class="sub">Продажа: 85% · ≈ ${sellUSD.toFixed(2)} $</div></div></div>
+        <div class="price">
+          <b class="mono" style="font-weight:950">${escapeHtml(fmtMoney(sellHome, homeCC))}</b>
+          <div class="btns" style="justify-content:flex-end"><button class="btn small" data-sell="${it.id}" type="button">Продать 1</button></div>
+        </div>
+      `;
+      list.appendChild(el);
+    }
+    list.querySelectorAll("button[data-sell]").forEach(b => b.addEventListener("click", () => sellItem(b.dataset.sell)));
+  }
+
+  function renderTop(){
+    const list = $("#topList");
+    list.innerHTML = "";
+
+    const arr = Object.values(state.users).map(u => {
+      ensureUser(u);
+      const usd = netWorthUSD(u);
+      const c = COUNTRIES.find(t=>t.code===u.countryCode);
+      return { nick:u.nick, countryName:c?.name||"—", usd, verified: !!u.verified };
+    }).sort((a,b)=>b.usd-a.usd).slice(0, 20);
+
+    if (!arr.length){
+      list.innerHTML = `<div class="hint">Пока нет пользователей.</div>`;
+      return;
+    }
+
+    arr.forEach((x,i) => {
+      const badge = x.verified ? " ✓" : "";
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div class="left"><div class="emoji">${i===0?"🥇":i===1?"🥈":i===2?"🥉":"🏅"}</div><div><div class="name">#${i+1} ${escapeHtml(x.nick)}${badge}</div><div class="sub">${escapeHtml(x.countryName)}</div></div></div>
+        <div class="price"><b class="mono" style="font-weight:950">${escapeHtml(fmtMoney(x.usd, "USD"))}</b><small class="sub mono">net worth</small></div>
+      `;
+      list.appendChild(el);
+    });
+  }
+
+  function renderProfile(){
+    const u = currentUser(); if (!u) return;
+    $("#prNick").value = u.nick;
+    $("#prCountry").value = u.countryCode;
+    $("#prLang").value = u.langCode;
+  }
+
+  function renderSettings(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    $("#setPin").value = "";
+    updateAvatarUI(u);
+  }
+
+  function renderUI(){
+    updateUIReadouts(uiFromInputs());
+  }
+
+  function renderAdmin(){
+    const u = currentUser();
+    if (!isAdmin(u)) return;
+
+    const users = Object.values(state.users);
+    const txCount = users.reduce((sum, uu) => sum + (uu.txs ? uu.txs.length : 0), 0);
+    $("#kpiUsers").textContent = String(users.length);
+    $("#kpiTx").textContent = String(txCount);
+    $("#kpiWorth").textContent = fmtMoney(netWorthUSD(u), "USD");
+
+    const nicks = users.map(x=>x.nick).sort((a,b)=>a.localeCompare(b));
+    $("#admUserPick2").innerHTML = nicks.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+    $("#admUserPick3").innerHTML = nicks.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+
+    $("#admUserPick2").value = ADMIN_NICK;
+    $("#admUserPick3").value = ADMIN_NICK;
+
+    const updUserInfo = () => {
+      const nick = $("#admUserPick2").value;
+      const target = state.users[nick];
+      if (!target){ $("#admUserInfo").textContent = "Пользователь не найден."; return; }
+      ensureUser(target);
+      const cc = homeCurrencyCode(target);
+      const bal = getBal(target,cc);
+      $("#admUserInfo").textContent = `@${target.nick} · валюта: ${cc} · баланс: ${fmtMoney(bal, cc)} · галочка: ${target.verified ? "есть" : "нет"}`;
+    };
+
+    const updToolsState = () => {
+      const d = discountHintText();
+      const nick = $("#admUserPick3").value;
+      const t = state.users[nick];
+      const v = t ? (t.verified ? "есть" : "нет") : "—";
+      $("#admToolsState").textContent = `${d ? d : "Скидки нет"} · галочка у ${nick}: ${v}`;
+    };
+
+    $("#admUserPick2").onchange = () => { updUserInfo(); };
+    $("#admUserPick3").onchange = () => { updToolsState(); };
+
+    $("#btnAdmSendMsg").onclick = () => {
+      const text = ($("#admMsg").value || "").trim();
+      if (!text) return toast("Админ", "Текст пустой.");
+      const a = { id: uid(), text, at: now(), by: ADMIN_NICK };
+      localStorage.setItem(ANNOUNCE_KEY, JSON.stringify(a));
+      $("#admMsg").value = "";
+      toast("Админ", "Сообщение сохранено.");
+    };
+    $("#btnAdmClearMsg").onclick = () => {
+      localStorage.removeItem(ANNOUNCE_KEY);
+      toast("Админ", "Сообщение очищено.");
+    };
+
+    $("#btnAdmSelfAdd").onclick = () => {
+      const amt = Number($("#admSelfAdd").value || 0);
+      if (!(amt > 0)) return toast("Админ", "Сумма должна быть > 0.");
+      const cc = homeCurrencyCode(u);
+      addBal(u,cc,amt);
+      pushTx(u,{ id:uid(), at:now(), kind:"admin", title:"Админ: начисление", amount:amt, currencyCode:cc, usd:toUSD(amt,cc), sign:"+", note:"self" });
+      $("#admSelfAdd").value = "";
+      save();
+      toast("Админ", "Начислено.");
+      render();
+    };
+    $("#btnAdmSelfSub").onclick = () => {
+      const amt = Number($("#admSelfSub").value || 0);
+      if (!(amt > 0)) return toast("Админ", "Сумма должна быть > 0.");
+      const cc = homeCurrencyCode(u);
+      addBal(u,cc,-amt);
+      pushTx(u,{ id:uid(), at:now(), kind:"admin", title:"Админ: списание", amount:amt, currencyCode:cc, usd:toUSD(amt,cc), sign:"-", note:"self" });
+      $("#admSelfSub").value = "";
+      save();
+      toast("Админ", "Списано.");
+      render();
+    };
+
+    $("#btnAdmUserGive").onclick = () => {
+      const nick = $("#admUserPick2").value;
+      const target = state.users[nick];
+      if (!target) return toast("Админ", "Пользователь не найден.");
+      ensureUser(target);
+      const amt = Number($("#admUserGive").value || 0);
+      if (!(amt > 0)) return toast("Админ", "Сумма должна быть > 0.");
+      const cc = homeCurrencyCode(target);
+      addBal(target,cc,amt);
+      pushTx(target,{ id:uid(), at:now(), kind:"admin", title:`Админ (${ADMIN_NICK}): выдача`, amount:amt, currencyCode:cc, usd:toUSD(amt,cc), sign:"+", note:"user" });
+      $("#admUserGive").value = "";
+      save();
+      toast("Админ", `Выдано: ${nick}`);
+      updUserInfo();
+      render();
+    };
+    $("#btnAdmUserTake").onclick = () => {
+      const nick = $("#admUserPick2").value;
+      const target = state.users[nick];
+      if (!target) return toast("Админ", "Пользователь не найден.");
+      ensureUser(target);
+      const amt = Number($("#admUserTake").value || 0);
+      if (!(amt > 0)) return toast("Админ", "Сумма должна быть > 0.");
+      const cc = homeCurrencyCode(target);
+      addBal(target,cc,-amt);
+      pushTx(target,{ id:uid(), at:now(), kind:"admin", title:`Админ (${ADMIN_NICK}): изъятие`, amount:amt, currencyCode:cc, usd:toUSD(amt,cc), sign:"-", note:"user" });
+      $("#admUserTake").value = "";
+      save();
+      toast("Админ", `Забрано: ${nick}`);
+      updUserInfo();
+      render();
+    };
+
+    $("#btnAdmImpersonate").onclick = () => {
+      const nick = $("#admUserPick2").value;
+      if (!state.users[nick]) return toast("Админ", "Пользователь не найден.");
+      state.session.nick = nick;
+      save();
+      toast("Админ", `Вход как ${nick}`);
+      go("home");
+    };
+
+    $("#btnAdmDeleteUser").onclick = () => {
+      const nick = $("#admUserPick2").value;
+      if (!state.users[nick]) return toast("Админ", "Пользователь не найден.");
+      if (nick === ADMIN_NICK) return toast("Админ", "Нельзя удалить себя.");
+      delete state.users[nick];
+      save();
+      toast("Админ", `Удалён: ${nick}`);
+      render();
+    };
+
+    $("#btnAdmStartDiscount").onclick = () => {
+      const p = clamp(Number($("#admDiscPercent").value || 0), 0, 90);
+      const mins = clamp(Number($("#admDiscMins").value || 0), 1, 10080);
+      state.marketDiscount.active = true;
+      state.marketDiscount.percent = p;
+      state.marketDiscount.until = now() + mins * 60000;
+      save();
+      toast("Админ", `Скидка -${p}% на ${mins} мин`);
+      updToolsState();
+      renderMarket();
+    };
+    $("#btnAdmStopDiscount").onclick = () => {
+      state.marketDiscount.active = false;
+      state.marketDiscount.percent = 0;
+      state.marketDiscount.until = 0;
+      save();
+      toast("Админ", "Скидка остановлена");
+      updToolsState();
+      renderMarket();
+    };
+
+    $("#btnAdmGiveCheck").onclick = () => {
+      const nick = $("#admUserPick3").value;
+      const t = state.users[nick];
+      if (!t) return toast("Админ", "Пользователь не найден.");
+      ensureUser(t);
+      t.verified = true;
+      save();
+      toast("Админ", `Галочка: ${nick}`);
+      updToolsState();
+      render();
+    };
+    $("#btnAdmRemoveCheck").onclick = () => {
+      const nick = $("#admUserPick3").value;
+      if (nick === ADMIN_NICK) return toast("Админ", "Нельзя убрать галочку у себя.");
+      const t = state.users[nick];
+      if (!t) return toast("Админ", "Пользователь не найден.");
+      ensureUser(t);
+      t.verified = false;
+      save();
+      toast("Админ", `Галочка убрана: ${nick}`);
+      updToolsState();
+      render();
+    };
+
+    updUserInfo();
+    updToolsState();
+  }
+
+  function render(){
+    updateChip();
+    renderSidebarBadges();
+    const active = $$(".screen").find(s => s.classList.contains("active"))?.id || "";
+    if (active === "screen-home") renderHome();
+    if (active === "screen-transfer") renderTransfer();
+    if (active === "screen-exchange") renderExchange();
+    if (active === "screen-accounts") renderAccounts();
+    if (active === "screen-market") renderMarket();
+    if (active === "screen-top") renderTop();
+    if (active === "screen-profile") renderProfile();
+    if (active === "screen-settings") renderSettings();
+    if (active === "screen-ui") renderUI();
+    if (active === "screen-admin") renderAdmin();
+    if (active === "screen-whatsnew") renderWhatsNew();
+  }
+
+  function register(){
+    const nick = ($("#regNick").value || "").trim();
+    const pass = $("#regPass").value || "";
+    const countryCode = $("#regCountry").value;
+    const langCode = $("#regLang").value;
+    const bonusKind = $("#regBonus").value;
+
+    if (nick.length < 3) return toast("Регистрация", "Ник минимум 3 символа.");
+    if (pass.length < 4) return toast("Регистрация", "Пароль минимум 4 символа.");
+    if (state.users[nick]) return toast("Регистрация", "Такой ник уже существует.");
+
+    const cardNumber = generateUniqueCard("6767");
+
+    const u = {
+      id: uid(),
+      nick,
+      passHash: hashPassword(pass),
+      countryCode,
+      langCode,
+      createdAt: now(),
+      accounts: { main:{balances:{}} },
+      inventory: {},
+      txs: [],
+      card: { number: cardNumber, exp: "12/30" },
+      verified: (nick === ADMIN_NICK),
+      deposit: { open:false, currencyCode:null, balance:0, openedAt:0, maturesAt:0 },
+      products: [{ id:"prod_card", type:"card", title:"FanCard", createdAt: now() }],
+      profile: { avatarDataUrl: null, pinHash: null }
+    };
+
+    registerCardToIndex(cardNumber, nick);
+    ensureUser(u);
+
+    const homeCC = homeCurrencyCode(u);
+    const bonus = pickBonus(bonusKind, homeCC);
+    addBal(u, homeCC, bonus);
+
+    pushTx(u, { id:uid(), at:now(), kind:"bonus", title:"Стартовый бонус", amount:bonus, currencyCode:homeCC, usd:toUSD(bonus,homeCC), sign:"+", note:"приветственный" });
+
+    state.users[nick] = u;
+    state.session.nick = nick;
+    save();
+
+    $("#registerCard").style.display = "none";
+    toast("Готово", `FanCard: ${u.card.number}`);
+    maybeSplashOnLogin();
+    go("home");
+  }
+
+  function login(){
+    const nick = ($("#loginNick").value || "").trim();
+    const pass = $("#loginPass").value || "";
+    const u = state.users[nick];
+    if (!u) return toast("Вход", "Пользователь не найден.");
+    if (u.passHash !== hashPassword(pass)) return toast("Вход", "Неверный пароль.");
+    ensureUser(u);
+
+    state.session.nick = nick;
+    save();
+    toast("Вход", `Привет, ${nick}!`);
+    maybeAnnouncement();
+    maybeSplashOnLogin();
+    go("home");
+  }
+
+  function logout(){
+    state.session.nick = null;
+    save();
+    toast("Выход", "Сессия завершена.");
+    go("auth");
+  }
+
+  function daily(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+
+    const homeCC = homeCurrencyCode(u);
+    const oneDay = 24*60*60*1000;
+    const last = u.lastDailyAt || 0;
+    if (now() - last < oneDay){
+      const hrs = Math.ceil((oneDay - (now()-last)) / (60*60*1000));
+      return toast("Дейли", `Уже забрано. Осталось ~${hrs} ч.`);
+    }
+
+    const rewardUSD = 15 + Math.random()*30;
+    const reward = fromUSD(rewardUSD, homeCC);
+    addBal(u,homeCC,reward);
+    u.lastDailyAt = now();
+
+    pushTx(u, { id:uid(), at:now(), kind:"bonus", title:"Дейли-бонус", amount:reward, currencyCode:homeCC, usd:rewardUSD, sign:"+", note:"раз в день" });
+    save();
+    toast("Дейли", `${fmtMoney(reward, homeCC)} (≈ ${fmtMoney(rewardUSD,"USD")})`);
+    render();
+  }
+
+  function createProduct(type){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+
+    if (type === "account"){
+      u.products.push({ id:"prod_acc_" + uid(), type:"account", title:"Счёт", createdAt: now() });
+      pushTx(u, { id:uid(), at:now(), kind:"product", title:"Создан продукт: счёт", amount:0, currencyCode:homeCurrencyCode(u), usd:0, sign:"", note:"" });
+      save();
+      toast("Счета", "Счёт создан.");
+      closeSheet();
+      render();
+      return;
+    }
+
+    if (type === "deposit"){
+      closeSheet();
+      openDeposit();
+      return;
+    }
+
+    if (type === "bizcard"){
+      if (u.bizCard) { toast("Business Card", "У тебя уже есть бизнес-карта."); closeSheet(); return; }
+      const num = generateUniqueCard("4242");
+      u.bizCard = { number: num, exp:"12/30" };
+      registerCardToIndex(num, u.nick);
+      u.products.push({ id:"prod_bizcard", type:"bizcard", title:"Business Card", createdAt: now() });
+      pushTx(u, { id:uid(), at:now(), kind:"bizcard", title:"Создана Business Card", amount:0, currencyCode:homeCurrencyCode(u), usd:0, sign:"", note:num });
+      save();
+      toast("Business Card", "Создана и добавлена в карусель “Карты”.");
+      closeSheet();
+      render();
+      return;
+    }
+
+    if (type === "mortgage"){
+      u.products.push({ id:"prod_mort_" + uid(), type:"mortgage", title:"Ипотека", createdAt: now() });
+      pushTx(u, { id:uid(), at:now(), kind:"product", title:"Создан продукт: ипотека (демо)", amount:0, currencyCode:homeCurrencyCode(u), usd:0, sign:"", note:"пока без расчётов" });
+      save();
+      toast("Ипотека", "Создана (демо).");
+      closeSheet();
+      render();
+      return;
+    }
+  }
+
+  function openDeposit(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+
+    const dep = u.deposit;
+    if (dep.open) return toast("Вклад", "Уже есть активный вклад.");
+
+    const homeCC = homeCurrencyCode(u);
+    const amt = Number(prompt("Сумма вклада (в домашней валюте):", "1000") || 0);
+    if (!(amt > 0)) return;
+
+    const bal = getBal(u,homeCC);
+    if (bal + 1e-9 < amt) return toast("Вклад", "Недостаточно средств.");
+
+    addBal(u,homeCC,-amt);
+    dep.open = true;
+    dep.currencyCode = homeCC;
+    dep.balance = Math.round(amt*100)/100;
+    dep.openedAt = now();
+    dep.maturesAt = now() + 7*24*60*60*1000;
+
+    pushTx(u, { id:uid(), at:now(), kind:"deposit_open", title:"Открыт вклад", amount:amt, currencyCode:homeCC, usd:toUSD(amt,homeCC), sign:"-", note:"7 дней" });
+    save();
+    toast("Вклад", "Открыт.");
+    render();
+  }
+
+  function closeDeposit(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    const dep = u.deposit;
+    if (!dep.open) return;
+    if (now() < dep.maturesAt) return toast("Вклад", "Ещё рано.");
+
+    const gain = dep.balance * 0.03;
+    const payout = dep.balance + gain;
+    addBal(u,dep.currencyCode,payout);
+
+    pushTx(u, { id:uid(), at:now(), kind:"deposit_close", title:"Вклад закрыт (+3%)", amount:payout, currencyCode:dep.currencyCode, usd:toUSD(payout,dep.currencyCode), sign:"+", note:`прибыль ${fmtMoney(gain, dep.currencyCode)}` });
+
+    dep.open = false; dep.currencyCode = null; dep.balance = 0; dep.openedAt = 0; dep.maturesAt = 0;
+    save();
+    toast("Вклад", "Закрыт.");
+    render();
+  }
+
+  function sendTransfer(){
+    const u = currentUser(); if (!u) return;
+    const mode = $("#trMode").value;
+    const toRaw = ($("#trTo").value||"").trim();
+    const amount = Number($("#trAmount").value||0);
+    const fromCC = $("#trCurrency").value;
+    const note = ($("#trComment").value||"").trim();
+
+    if (!(amount > 0)) return toast("Перевод", "Сумма должна быть > 0.");
+
+    let r = null;
+    if (mode === "nick"){
+      if (!toRaw) return toast("Перевод", "Укажи ник получателя.");
+      r = state.users[toRaw] || null;
+      if (!r) return toast("Перевод", "Получатель не найден.");
+    } else {
+      if (!toRaw) return toast("Перевод", "Укажи номер карты.");
+      r = findUserByCard(toRaw);
+      if (!r) return toast("Перевод", "Карта не найдена.");
+    }
+    if (r.nick === u.nick) return toast("Перевод", "Нельзя перевести себе.");
+
+    const bal = getBal(u,fromCC);
+    if (bal + 1e-9 < amount) return toast("Перевод", "Недостаточно средств.");
+
+    ensureUser(r);
+
+    const usd = toUSD(amount, fromCC);
+    const toCC = homeCurrencyCode(r);
+    const out = convert(amount, fromCC, toCC);
+
+    addBal(u,fromCC,-amount);
+    pushTx(u, { id:uid(), at:now(), kind:"transfer_out", title:`Перевод → ${r.nick}`, amount, currencyCode:fromCC, usd, sign:"-", note: note ? note : `получит ${fmtMoney(out,toCC)}` });
+
+    addBal(r,toCC,out);
+    pushTx(r, { id:uid(), at:now(), kind:"transfer_in", title:`Перевод от ${u.nick}`, amount:out, currencyCode:toCC, usd, sign:"+", note: note ? note : `отправлено ${fmtMoney(amount,fromCC)}` });
+
+    save();
+    $("#trAmount").value = "";
+    $("#trComment").value = "";
+    toast("Отправлено", `${r.nick}: ${fmtMoney(out, toCC)} (≈ ${fmtMoney(usd,"USD")})`);
+    updateTransferHint();
+    updateTransferPreview();
+    render();
+  }
+
+  function doExchange(){
+    const u = currentUser(); if (!u) return;
+
+    const from = $("#exFrom").value;
+    const to = $("#exTo").value;
+    const amt = Number($("#exAmount").value || 0);
+
+    if (from === to) return toast("Обмен", "Выбери разные валюты.");
+    if (!(amt > 0)) return toast("Обмен", "Сумма должна быть > 0.");
+
+    const bal = getBal(u,from);
+    if (bal + 1e-9 < amt) return toast("Обмен", "Недостаточно средств.");
+
+    const out = convert(amt, from, to);
+    const usd = toUSD(amt, from);
+
+    addBal(u,from,-amt);
+    addBal(u,to,out);
+
+    pushTx(u, { id:uid(), at:now(), kind:"exchange", title:`Обмен ${from} → ${to}`, amount:amt, currencyCode:from, usd, sign:"-", note:`получено ${fmtMoney(out,to)}` });
+
+    save();
+    $("#exAmount").value = "";
+    toast("Обмен", `${fmtMoney(amt, from)} → ${fmtMoney(out, to)}`);
+    previewExchange();
+    render();
+  }
+
+  function reprice(){
+    state.market.items = state.market.items.map(it => {
+      const drift = (Math.random()*0.06)-0.03;
+      const next = clamp(it.priceUSD*(1+drift), it.baseUSD*0.6, it.baseUSD*1.8);
+      return {...it, priceUSD: Math.round(next*100)/100};
+    });
+    save();
+    toast("Маркет", "Цены обновлены.");
+    render();
+  }
+
+  function buyItem(itemId){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    const it = state.market.items.find(x=>x.id===itemId);
+    if (!it) return;
+
+    const homeCC = homeCurrencyCode(u);
+    const effectiveUSD = discountedPriceUSD(it.priceUSD);
+    const costHome = fromUSD(effectiveUSD, homeCC);
+
+    const bal = getBal(u,homeCC);
+    if (bal + 1e-9 < costHome) return toast("Покупка", `Нужно ${fmtMoney(costHome, homeCC)}.`);
+
+    addBal(u,homeCC,-costHome);
+    u.inventory[itemId] = Number(u.inventory[itemId]||0) + 1;
+
+    pushTx(u, { id:uid(), at:now(), kind:"buy", title:`Покупка: ${it.name}`, amount:costHome, currencyCode:homeCC, usd:effectiveUSD, sign:"-", note: it.emoji });
+
+    save();
+    toast("Куплено", `${it.name}`);
+    render();
+  }
+
+  function sellItem(itemId){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    const qty = Number(u.inventory[itemId]||0);
+    if (qty <= 0) return;
+
+    const it = state.market.items.find(x=>x.id===itemId);
+    if (!it) return;
+
+    const homeCC = homeCurrencyCode(u);
+    const sellUSD = it.priceUSD * 0.85;
+    const sellHome = fromUSD(sellUSD, homeCC);
+
+    u.inventory[itemId] = qty - 1;
+    if (u.inventory[itemId] <= 0) delete u.inventory[itemId];
+
+    addBal(u,homeCC,sellHome);
+    pushTx(u, { id:uid(), at:now(), kind:"sell", title:`Продажа: ${it.name}`, amount:sellHome, currencyCode:homeCC, usd:sellUSD, sign:"+", note: it.emoji });
+
+    save();
+    toast("Продано", `${it.name}`);
+    render();
+  }
+
+  function saveProfile(){
+    const u = currentUser(); if (!u) return;
+    u.countryCode = $("#prCountry").value;
+    u.langCode = $("#prLang").value;
+    save();
+    toast("Профиль", "Сохранено.");
+    render();
+  }
+
+  function savePin(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    const pin = ($("#setPin").value || "").trim();
+    if (!pin){
+      u.profile.pinHash = null;
+      save();
+      toast("PIN", "PIN отключён.");
+      return;
+    }
+    if (!/^\d{4}$/.test(pin)){
+      toast("PIN", "Нужно ровно 4 цифры.");
+      return;
+    }
+    u.profile.pinHash = hashPin(pin);
+    save();
+    toast("PIN", "PIN сохранён.");
+    $("#setPin").value = "";
+  }
+  function disablePin(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    u.profile.pinHash = null;
+    save();
+    toast("PIN", "PIN отключён.");
+    $("#setPin").value = "";
+  }
+
+  function saveAvatar(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+
+    const file = $("#avatarFile").files?.[0];
+    if (!file){
+      toast("Аватар", "Выбери файл.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      u.profile.avatarDataUrl = String(reader.result || "");
+      save();
+      toast("Аватар", "Сохранено.");
+      updateSidebar();
+      render();
+    };
+    reader.onerror = () => toast("Аватар", "Не удалось прочитать файл.");
+    reader.readAsDataURL(file);
+  }
+
+  function clearAvatar(){
+    const u = currentUser(); if (!u) return;
+    ensureUser(u);
+    u.profile.avatarDataUrl = null;
+    save();
+    toast("Аватар", "Удалено.");
+    updateSidebar();
+    render();
+  }
+
+  function wipeAll(){
+    if (!confirm("Стереть все данные FunBank в этом браузере?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(UI_KEY);
+    localStorage.removeItem(ANNOUNCE_KEY);
+    localStorage.removeItem("funbank.splash.once.done");
+    localStorage.removeItem(WHATSNEW_KEY);
+    state = defaultDB();
+    toast("Сброс", "Данные очищены.");
+    go("auth");
+  }
+
+  function maybeSeedCardIndex(){
+    if (Object.keys(state.cardIndex || {}).length > 0) return;
+    for (const u of Object.values(state.users || {})){
+      if (!u?.nick) continue;
+      if (u.card?.number) state.cardIndex[u.card.number] = u.nick;
+      if (u.bizCard?.number) state.cardIndex[u.bizCard.number] = u.nick;
+    }
+    save();
+  }
+
+  function initUI(){
+    const ui = loadUI() || { theme:"light", splashMode:"always", bgSpeed:18, warpStrength:22, grainOpacity:0.08, glass:1, radius:20 };
+    $("#setBgSpeed").value = ui.bgSpeed ?? 18;
+    $("#setWarp").value = ui.warpStrength ?? 22;
+    $("#setGrain").value = Math.round((ui.grainOpacity ?? 0.08) * 100);
+    $("#setGlass").value = Math.round((ui.glass ?? 1) * 100);
+    $("#setRadius").value = ui.radius ?? 20;
+    $("#setSplashMode").value = ui.splashMode ?? "always";
+    applyUI(ui);
+    updateUIReadouts(uiFromInputs());
+
+    $("#btnThemeLight").addEventListener("click", () => setTheme("light"));
+    $("#btnThemeDark").addEventListener("click", () => setTheme("dark"));
+    $("#btnThemeLight2").addEventListener("click", () => setTheme("light"));
+    $("#btnThemeDark2").addEventListener("click", () => setTheme("dark"));
+    $("#btnThemeToggle").addEventListener("click", () => {
+      const cur = document.body.getAttribute("data-theme") || "light";
+      setTheme(cur === "light" ? "dark" : "light");
+    });
+
+    $("#btnSaveUI").addEventListener("click", () => {
+      const ui2 = loadUI() || {};
+      Object.assign(ui2, uiFromInputs(), { theme: document.body.getAttribute("data-theme") || "light" });
+      saveUI(ui2);
+      applyUI(ui2);
+      updateUIReadouts(uiFromInputs());
+      toast("Оформление", "Сохранено.");
+    });
+
+    $("#btnResetUI").addEventListener("click", () => {
+      const ui2 = { theme:"light", splashMode:"always", bgSpeed:18, warpStrength:22, grainOpacity:0.08, glass:1, radius:20 };
+      saveUI(ui2);
+      applyUI(ui2);
+      $("#setBgSpeed").value = 18;
+      $("#setWarp").value = 22;
+      $("#setGrain").value = 8;
+      $("#setGlass").value = 100;
+      $("#setRadius").value = 20;
+      $("#setSplashMode").value = "always";
+      updateUIReadouts(uiFromInputs());
+      toast("Оформление", "Сброшено.");
+    });
+
+    ["#setBgSpeed","#setWarp","#setGrain","#setGlass","#setRadius","#setSplashMode"].forEach(sel => {
+      $(sel).addEventListener("input", () => {
+        const uiLive = uiFromInputs();
+        applyUI({ ...(loadUI()||{}), ...uiLive, theme: document.body.getAttribute("data-theme") || "light" });
+        updateUIReadouts(uiLive);
+      });
+    });
+
+    $("#btnShowSplashNow").addEventListener("click", () => {
+      const u = currentUser();
+      if (!u) return toast("Приветствие", "Сначала войди или зарегистрируйся.");
+      showSplashForUser(u.nick);
+    });
+  }
+
+  function init(){
+    fillSelects();
+    initUI();
+    maybeSeedCardIndex();
+    renderSidebarBadges();
+
+    bindPrettyFile("avatarFile","avatarPickBtn","avatarFileName");
+
+    // sidebar
+    $("#chip").addEventListener("click", openSidebar);
+    $("#btnOpenSidebar").addEventListener("click", openSidebar);
+    $("#btnOpenSidebar2").addEventListener("click", openSidebar);
+    $("#btnSbClose").addEventListener("click", closeSidebar);
+    $("#sbBackdrop").addEventListener("click", closeSidebar);
+    $("#btnSbTheme").addEventListener("click", () => {
+      const cur = document.body.getAttribute("data-theme") || "light";
+      setTheme(cur === "light" ? "dark" : "light");
+      updateSidebar();
+    });
+    $$(".sbItem").forEach(it => it.addEventListener("click", () => go(it.dataset.nav)));
+
+    // product modal
+    $("#btnCreateProduct").addEventListener("click", openSheet);
+    $("#btnSheetClose").addEventListener("click", closeSheet);
+    $("#sheetBackdrop").addEventListener("click", closeSheet);
+    $$(".sheetBtn").forEach(b => b.addEventListener("click", () => createProduct(b.dataset.create)));
+
+    // auth
+    $("#btnGoRegister").addEventListener("click", () => {
+      $("#registerCard").style.display = "block";
+      $("#regCountry").value = "RU";
+      $("#regLang").value = "ru";
+    });
+    $("#btnCancelRegister").addEventListener("click", () => $("#registerCard").style.display = "none");
+    $("#regCountry").addEventListener("change", () => {
+      const c = COUNTRIES.find(x=>x.code === $("#regCountry").value);
+      if (c) $("#regLang").value = c.lang;
+    });
+
+    $("#btnRegister").addEventListener("click", register);
+    $("#btnLogin").addEventListener("click", login);
+    $("#loginPass").addEventListener("keydown", (e)=>{ if (e.key==="Enter") login(); });
+    $("#regPass").addEventListener("keydown", (e)=>{ if (e.key==="Enter") register(); });
+
+    // what's new
+    $("#btnMarkWhatsNewRead").addEventListener("click", () => { markWhatsNewRead(); });
+
+    // home
+    $("#btnLogout").addEventListener("click", logout);
+    $("#btnDaily").addEventListener("click", daily);
+
+    // transfer
+    $("#btnSend").addEventListener("click", sendTransfer);
+    $("#trCurrency").addEventListener("change", () => { updateTransferHint(); updateTransferPreview(); });
+    $("#trMode").addEventListener("change", () => { updateTransferUI(); updateTransferPreview(); });
+    $("#trTo").addEventListener("input", updateTransferPreview);
+    $("#trAmount").addEventListener("input", updateTransferPreview);
+
+    // exchange
+    $("#btnExchange").addEventListener("click", doExchange);
+    $("#exFrom").addEventListener("change", previewExchange);
+    $("#exTo").addEventListener("change", previewExchange);
+    $("#exAmount").addEventListener("input", previewExchange);
+
+    // market
+    $("#btnReprice").addEventListener("click", reprice);
+
+    // top
+    $("#btnRecalcTop").addEventListener("click", () => { toast("Топ", "Готово."); renderTop(); });
+
+    // profile
+    $("#btnSaveProfile").addEventListener("click", saveProfile);
+    $("#btnWipe").addEventListener("click", wipeAll);
+
+    // settings
+    $("#btnSavePin").addEventListener("click", savePin);
+    $("#btnDisablePin").addEventListener("click", disablePin);
+    $("#btnSaveAvatar").addEventListener("click", saveAvatar);
+    $("#btnClearAvatar").addEventListener("click", clearAvatar);
+
+    // splash PIN
+    $("#pinInput").addEventListener("input", () => updatePinDots($("#pinInput").value));
+    $("#pinInput").addEventListener("keydown", (e) => { if (e.key === "Enter") verifyPinAndContinue(); });
+    $("#pinOk").addEventListener("click", verifyPinAndContinue);
+    $("#pinCancel").addEventListener("click", () => { closeSplash(); logout(); });
+
+    // nav
+    $$(".tab").forEach(t => t.addEventListener("click", () => go(t.dataset.nav)));
+    $$("[data-nav]").forEach(b => {
+      if (b.classList.contains("tab")) return;
+      if (b._navAttached) return;
+      b._navAttached = true;
+      b.addEventListener("click", () => go(b.dataset.nav));
+    });
+
+    updateChip();
+
+    if (currentUser()){
+      maybeAnnouncement();
+      maybeSplashOnLogin();
+      go("home");
+    } else {
+      go("auth");
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
