@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FunBank - Виртуальный банк</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         * {
             margin: 0;
@@ -35,6 +35,20 @@
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* DARK THEME */
+        body.dark-theme {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #404040;
+        }
+
+        body.dark-theme .wallet-back {
+            background: #0a0a0a;
         }
 
         /* ============ AUTH SCREEN ============ */
@@ -134,7 +148,7 @@
             color: var(--text-primary);
         }
 
-        .form-group input {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 14px 16px;
             background: var(--bg-primary);
@@ -147,7 +161,7 @@
             transition: all 0.2s ease;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: var(--purple-primary);
             background: var(--bg-secondary);
@@ -239,6 +253,13 @@
             font-size: 16px;
             font-weight: 600;
             color: white;
+            overflow: hidden;
+        }
+
+        .sidebar-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .sidebar-user-info h3 {
@@ -324,21 +345,21 @@
 
         /* MOBILE TOGGLE */
         .sidebar-toggle {
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    width: 44px;
-    height: 44px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1100;
-    box-shadow: var(--shadow-md);
-}
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1100;
+            box-shadow: var(--shadow-md);
+        }
 
         .sidebar-toggle svg {
             width: 24px;
@@ -413,23 +434,23 @@
             transition: all 0.2s ease;
         }
 
-/* FIX: Badge как круг */
-.icon-btn .badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 18px; /* добавь эту строку */
-    height: 18px;
-    background: var(--red-primary);
-    color: white;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px; /* добавь эту строку */
-}
+        .icon-btn .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            width: auto;
+            height: 18px;
+            background: var(--red-primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
 
         /* Main Grid */
         .main-grid {
@@ -953,6 +974,72 @@
             box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
         }
 
+        /* Transaction History */
+        .transaction-item {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .transaction-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon.income {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--green-primary);
+        }
+
+        .transaction-icon.expense {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--red-primary);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .transaction-amount.positive {
+            color: var(--green-primary);
+        }
+
+        .transaction-amount.negative {
+            color: var(--red-primary);
+        }
+
         /* ADMIN PANEL */
         .admin-grid {
             display: grid;
@@ -1065,6 +1152,7 @@
             border-radius: 8px;
             width: 300px;
             font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
         }
 
         .admin-table table {
@@ -1176,7 +1264,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
-            z-index: 1000;
+            z-index: 2000;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -1260,6 +1348,95 @@
             padding: 28px;
         }
 
+        /* Custom Alert */
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 3000;
+            animation: alertPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: none;
+        }
+
+        @keyframes alertPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .custom-alert.active {
+            display: block;
+        }
+
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2999;
+            display: none;
+        }
+
+        .alert-overlay.active {
+            display: block;
+        }
+
+        .alert-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .alert-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .alert-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .alert-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-btn-primary {
+            background: var(--purple-primary);
+            color: white;
+        }
+
+        .alert-btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .alert-btn:hover {
+            transform: translateY(-2px);
+        }
+
         /* Leaderboard */
         .leaderboard-item {
             background: var(--bg-primary);
@@ -1332,9 +1509,10 @@
             box-shadow: var(--shadow-lg);
             font-weight: 500;
             font-size: 14px;
-            z-index: 2000;
+            z-index: 2500;
             max-width: 320px;
             animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--border-color);
         }
 
         @keyframes slideInRight {
@@ -1351,16 +1529,103 @@
         .notification.error {
             background: var(--red-primary);
             color: white;
+            border-color: var(--red-primary);
         }
 
         .notification.success {
             background: var(--green-primary);
             color: white;
+            border-color: var(--green-primary);
         }
 
         .notification.info {
             background: var(--purple-primary);
             color: white;
+            border-color: var(--purple-primary);
+        }
+
+        /* Avatar Upload */
+        .avatar-upload {
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--purple-primary), var(--purple-light));
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-input {
+            display: none;
+        }
+
+        /* Changelog */
+        .changelog-item {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .changelog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .changelog-version {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--purple-primary);
+        }
+
+        .changelog-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .changelog-changes {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .changelog-changes li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .changelog-changes li::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            color: var(--purple-primary);
+            font-weight: 900;
         }
 
         /* Page Content */
@@ -1393,22 +1658,40 @@
             margin-bottom: 24px;
         }
 
-        /* Responsive */
+        /* Mobile fixes */
         @media (max-width: 1024px) {
+            .sidebar-toggle {
+                display: flex;
+            }
+            
             .sidebar {
                 transform: translateX(-100%);
+                z-index: 1050;
             }
 
             .sidebar.active {
                 transform: translateX(0);
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
             }
-
-            .sidebar-toggle {
-                display: flex;
-            }
-
+            
             .main-content {
                 margin-left: 0;
+                padding-left: 80px;
+                padding-right: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding-left: 70px;
+                padding-right: 16px;
+                padding-top: 20px;
+            }
+            
+            .app-header {
+                padding: 16px;
+                flex-direction: column;
+                gap: 16px;
             }
 
             .main-grid {
@@ -1443,10 +1726,20 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
     </style>
 </head>
 <body>
+    <!-- Custom Alert -->
+    <div class="alert-overlay" id="alertOverlay"></div>
+    <div class="custom-alert" id="customAlert">
+        <div class="alert-title" id="alertTitle">Подтверждение</div>
+        <div class="alert-message" id="alertMessage">Вы уверены?</div>
+        <div class="alert-buttons">
+            <button class="alert-btn alert-btn-secondary" id="alertCancel">Отмена</button>
+            <button class="alert-btn alert-btn-primary" id="alertConfirm">Подтвердить</button>
+        </div>
+    </div>
+
     <!-- ============ AUTH SCREEN ============ -->
     <div id="authScreen">
         <div class="auth-container">
@@ -1525,6 +1818,12 @@
                         </svg>
                         <span>Главная</span>
                     </div>
+                    <div class="nav-item" onclick="switchPage('cards')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                        <span>Мои карты</span>
+                    </div>
                     <div class="nav-item" onclick="switchPage('business')">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -1557,6 +1856,18 @@
 
                 <div class="nav-section">
                     <div class="nav-section-title">Дополнительно</div>
+                    <div class="nav-item" onclick="switchPage('promo')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                        </svg>
+                        <span>Промокод</span>
+                    </div>
+                    <div class="nav-item" onclick="switchPage('changelog')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Изменения</span>
+                    </div>
                     <div class="nav-item" onclick="openModal('settings')">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -1590,7 +1901,7 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
-                        <span class="badge">3</span>
+                        <span class="badge" id="notificationBadge">0</span>
                     </button>
                 </div>
             </div>
@@ -1617,44 +1928,6 @@
                                         <div class="card-number-wrapper">
                                             <span class="hidden-stars">**** 0000</span>
                                             <span class="card-number">1234 5678 0000</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card wise">
-                                <div class="card-inner">
-                                    <div class="card-top">
-                                        <span>Business</span>
-                                        <div class="chip"></div>
-                                    </div>
-                                    <div class="card-bottom">
-                                        <div class="card-info">
-                                            <span class="label">Account</span>
-                                            <span class="value" id="businessCardName">FUNBANK LLC</span>
-                                        </div>
-                                        <div class="card-number-wrapper">
-                                            <span class="hidden-stars">**** 1234</span>
-                                            <span class="card-number">9876 5432 1234</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card paypal">
-                                <div class="card-inner">
-                                    <div class="card-top">
-                                        <span>Fun<b style="color:#6366f1">Bank</b></span>
-                                        <div class="chip"></div>
-                                    </div>
-                                    <div class="card-bottom">
-                                        <div class="card-info">
-                                            <span class="label">Premium</span>
-                                            <span class="value">GOLD CARD</span>
-                                        </div>
-                                        <div class="card-number-wrapper">
-                                            <span class="hidden-stars">**** 9999</span>
-                                            <span class="card-number">5555 4444 9999</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1775,6 +2048,70 @@
                             <div class="stat-box">
                                 <div class="stat-value" id="statDays">0</div>
                                 <div class="stat-label">Дней в банке</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS PAGE -->
+            <div id="cardsPage" class="page-content">
+                <div class="main-grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">Мои карты</div>
+                                <div class="card-subtitle">Управление счетами</div>
+                            </div>
+                        </div>
+
+                        <div id="cardsListMain">
+                            <div class="business-item">
+                                <div class="business-left">
+                                    <div class="business-icon-wrapper">
+                                        💳
+                                    </div>
+                                    <div class="business-details">
+                                        <h4>Основная карта</h4>
+                                        <p>**** 0000</p>
+                                    </div>
+                                </div>
+                                <div class="business-income">
+                                    <div class="income-value" id="mainCardBalance">0 FB</div>
+                                    <div class="income-period">Баланс</div>
+                                </div>
+                            </div>
+
+                            <div id="additionalCards"></div>
+                        </div>
+
+                        <button class="btn" onclick="openModal('createCard')">Создать карту для бизнеса</button>
+                    </div>
+
+                    <!-- CARD HISTORY -->
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">История операций</div>
+                                <div class="card-subtitle">Последние транзакции</div>
+                            </div>
+                        </div>
+                        <div id="transactionHistory">
+                            <div class="empty-state">
+                                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                <div class="empty-text">Нет операций</div>
                             </div>
                         </div>
                     </div>
@@ -1942,6 +2279,15 @@
                                 <div class="card-subtitle">Информация о пользователе</div>
                             </div>
                         </div>
+
+                        <div class="avatar-upload">
+                            <div class="avatar-preview" id="avatarPreview" onclick="document.getElementById('avatarInput').click()">
+                                <span id="avatarLetter">U</span>
+                            </div>
+                            <input type="file" id="avatarInput" class="avatar-input" accept="image/*" onchange="uploadAvatar(event)">
+                            <p style="font-size: 13px; color: var(--text-secondary);">Нажмите, чтобы изменить аватар</p>
+                        </div>
+
                         <div class="stats-grid">
                             <div class="stat-box">
                                 <div class="stat-value" id="profileBalance">0</div>
@@ -1967,6 +2313,80 @@
                             </li>
                         </ul>
                         <button class="btn btn-danger" onclick="logout()">Выйти из аккаунта</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROMO PAGE -->
+            <div id="promoPage" class="page-content">
+                <div class="main-grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">Активировать промокод</div>
+                                <div class="card-subtitle">Получите бонусы</div>
+                            </div>
+                        </div>
+
+                        <form class="auth-form" onsubmit="activatePromo(event)">
+                            <div class="form-group">
+                                <label>Введите промокод</label>
+                                <input type="text" id="promoInput" placeholder="WELCOME2024" required style="text-transform: uppercase;">
+                            </div>
+                            <button type="submit" class="btn">Активировать</button>
+                        </form>
+
+                        <div id="activatedPromos" style="margin-top: 24px;">
+                            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Активированные промокоды:</h4>
+                            <div id="promoList">
+                                <p style="text-align: center; color: var(--text-secondary); padding: 20px;">Вы пока не активировали ни одного промокода</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHANGELOG PAGE -->
+            <div id="changelogPage" class="page-content">
+                <div class="main-grid">
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">История изменений</div>
+                                <div class="card-subtitle">Обновления FunBank</div>
+                            </div>
+                        </div>
+
+                        <div class="changelog-item">
+                            <div class="changelog-header">
+                                <span class="changelog-version">v1.0.0</span>
+                                <span class="changelog-date">Сегодня</span>
+                            </div>
+                            <ul class="changelog-changes">
+                                <li>Запуск FunBank - виртуального банка</li>
+                                <li>Система карт и счетов</li>
+                                <li>Бизнес-система с пассивным доходом</li>
+                                <li>Ежедневные бонусы</li>
+                                <li>Система переводов между игроками</li>
+                                <li>Premium подписка</li>
+                                <li>Рейтинг игроков</li>
+                                <li>История транзакций</li>
+                                <li>Промокоды</li>
+                                <li>Темная тема</li>
+                                <li>Кастомные аватары</li>
+                                <li>Админ-панель</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2123,7 +2543,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, increment, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, increment, where, arrayUnion } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMrSrz1xKauScKRzWWAx8nkuMnFrwJ6pg",
@@ -2142,6 +2562,38 @@
         window.currentUser = null;
         window.userData = null;
         window.allUsers = [];
+        window.notifications = [];
+
+        // CUSTOM ALERT
+        window.customAlert = function(title, message, onConfirm) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('alertOverlay');
+                const alert = document.getElementById('customAlert');
+                const alertTitle = document.getElementById('alertTitle');
+                const alertMessage = document.getElementById('alertMessage');
+                const confirmBtn = document.getElementById('alertConfirm');
+                const cancelBtn = document.getElementById('alertCancel');
+
+                alertTitle.textContent = title;
+                alertMessage.textContent = message;
+
+                overlay.classList.add('active');
+                alert.classList.add('active');
+
+                confirmBtn.onclick = () => {
+                    overlay.classList.remove('active');
+                    alert.classList.remove('active');
+                    if (onConfirm) onConfirm();
+                    resolve(true);
+                };
+
+                cancelBtn.onclick = () => {
+                    overlay.classList.remove('active');
+                    alert.classList.remove('active');
+                    resolve(false);
+                };
+            });
+        };
 
         // NOTIFICATIONS
         window.showNotification = function(message, type = 'success') {
@@ -2149,794 +2601,31 @@
             notification.className = `notification ${type}`;
             notification.textContent = message;
             document.body.appendChild(notification);
+
+            // Add to notifications array
+            window.notifications.unshift({
+                message: message,
+                type: type,
+                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleDateString('ru-RU')
+            });
+
+            updateNotificationBadge();
+
             setTimeout(() => notification.remove(), 4000);
         };
 
-        // AUTH STATE
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                window.currentUser = user;
-                await loadUserData(user.uid);
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('bankApp').style.display = 'block';
-                startTimers();
-                loadLeaderboard();
-                
-                if (window.userData.isAdmin) {
-                    loadAdminData();
-                }
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            badge.textContent = window.notifications.length;
+            if (window.notifications.length > 0) {
+                badge.style.display = 'flex';
             } else {
-                document.getElementById('authScreen').style.display = 'flex';
-                document.getElementById('bankApp').style.display = 'none';
-            }
-        });
-
-        // LOAD USER DATA
-        async function loadUserData(uid) {
-            const userDoc = await getDoc(doc(db, 'users', uid));
-            if (userDoc.exists()) {
-                window.userData = userDoc.data();
-                updateUI();
-                
-                if (window.userData.isAdmin) {
-                    document.getElementById('adminNavSection').style.display = 'block';
-                }
+                badge.style.display = 'none';
             }
         }
 
-        // UPDATE UI
-        function updateUI() {
-            const balance = Math.floor(window.userData.balance);
-            const firstName = window.userData.name.charAt(0).toUpperCase();
-            
-            // Sidebar
-            document.getElementById('sidebarName').textContent = window.userData.name;
-            document.getElementById('sidebarUsername').textContent = `@${window.userData.username}`;
-            document.getElementById('sidebarAvatar').textContent = firstName;
-            
-            // Main
-            document.getElementById('totalBalance').textContent = balance.toLocaleString();
-            document.getElementById('statBalance').textContent = balance.toLocaleString();
-            document.getElementById('cardHolder1').textContent = window.userData.name.toUpperCase();
-            
-            if (window.userData.business) {
-                updateBusinessUI();
-                document.getElementById('businessStatus').textContent = 'Активен';
-            }
-            
-            const daysInBank = Math.floor((Date.now() - window.userData.createdAt) / (1000 * 60 * 60 * 24));
-            document.getElementById('statDays').textContent = daysInBank;
-            document.getElementById('profileBalance').textContent = balance.toLocaleString();
-            document.getElementById('profileDays').textContent = daysInBank;
-            document.getElementById('profileName').textContent = window.userData.name;
-            document.getElementById('profileEmail').textContent = window.userData.email;
-        }
-
-        // UPDATE BUSINESS UI
-        function updateBusinessUI() {
-            const business = window.userData.business;
-            const types = {
-                'business': { name: 'Бизнес', income: 500, tax: 50 },
-                'company': { name: 'Компания', income: 2000, tax: 200 },
-                'corporation': { name: 'Корпорация', income: 5000, tax: 500 }
-            };
-            
-            const type = types[business.type];
-            
-            const html = `
-                <div class="business-item">
-                    <div class="business-left">
-                        <div class="business-icon-wrapper">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
-                        </div>
-                        <div class="business-details">
-                            <h4>${type.name}</h4>
-                            <p>Доход каждые 2 часа</p>
-                        </div>
-                    </div>
-                    <div class="business-income">
-                        <div class="income-value">+${type.income} FB</div>
-                        <div class="income-period">Каждые 2ч</div>
-                    </div>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value" id="businessTimer">00:00:00</div>
-                        <div class="stat-label">До сбора</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">-${type.tax} FB</div>
-                        <div class="stat-label">Налог/час</div>
-                    </div>
-                </div>
-                <button class="btn btn-success" id="claimBusinessBtn" onclick="claimBusinessIncome()">Собрать доход</button>
-            `;
-            
-            document.getElementById('businessContent').innerHTML = html;
-            document.getElementById('businessContentMain').innerHTML = html;
-        }
-
-        // LOAD ADMIN DATA
-        async function loadAdminData() {
-            const usersRef = collection(db, 'users');
-            const snapshot = await getDocs(usersRef);
-            
-            let totalUsers = 0;
-            let totalBalance = 0;
-            let totalBusiness = 0;
-            let totalPremium = 0;
-            window.allUsers = [];
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                window.allUsers.push({ id: doc.id, ...data });
-                totalUsers++;
-                totalBalance += Math.floor(data.balance || 0);
-                if (data.business) totalBusiness++;
-                if (data.premium && data.premiumUntil > Date.now()) totalPremium++;
-            });
-            
-            document.getElementById('adminTotalUsers').textContent = totalUsers;
-            document.getElementById('adminTotalBalance').textContent = totalBalance.toLocaleString();
-            document.getElementById('adminTotalBusiness').textContent = totalBusiness;
-            document.getElementById('adminTotalPremium').textContent = totalPremium;
-            
-            renderAdminTable(window.allUsers);
-        }
-
-        // RENDER ADMIN TABLE
-        function renderAdminTable(users) {
-            const tbody = document.getElementById('adminUsersTable');
-            
-            let html = '';
-            users.forEach(user => {
-                const isPremium = user.premium && user.premiumUntil > Date.now();
-                const badgeClass = user.isAdmin ? 'badge-admin' : isPremium ? 'badge-premium' : 'badge-user';
-                const badgeText = user.isAdmin ? 'Admin' : isPremium ? 'Premium' : 'User';
-                
-                html += `
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-small">${user.name.charAt(0).toUpperCase()}</div>
-                                <div>
-                                    <div style="font-weight: 600;">${user.name}</div>
-                                    <div style="font-size: 12px; color: var(--text-secondary);">@${user.username}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${user.email}</td>
-                        <td style="font-weight: 700; color: var(--purple-primary);">${Math.floor(user.balance).toLocaleString()} FB</td>
-                        <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-icon-btn" onclick="editUser('${user.id}')" title="Редактировать">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </button>
-                                <button class="action-icon-btn" onclick="giveMoneyToUser('${user.id}')" title="Выдать деньги">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html || '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">Нет пользователей</td></tr>';
-        }
-
-        // FILTER ADMIN TABLE
-        window.filterAdminTable = function() {
-            const searchTerm = document.getElementById('adminSearchInput').value.toLowerCase();
-            const filtered = window.allUsers.filter(user => 
-                user.name.toLowerCase().includes(searchTerm) || 
-                user.username.toLowerCase().includes(searchTerm) ||
-                user.email.toLowerCase().includes(searchTerm)
-            );
-            renderAdminTable(filtered);
-        };
-
-        // EDIT USER
-        window.editUser = function(userId) {
-            const user = window.allUsers.find(u => u.id === userId);
-            if (!user) return;
-            
-            openModal('custom');
-            document.getElementById('modalTitle').textContent = 'Редактировать пользователя';
-            document.getElementById('modalBody').innerHTML = `
-                <form class="auth-form" onsubmit="updateUser(event, '${userId}')">
-                    <div class="form-group">
-                        <label>Имя</label>
-                        <input type="text" id="editName" value="${user.name}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Баланс (FB)</label>
-                        <input type="number" id="editBalance" value="${Math.floor(user.balance)}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Роль</label>
-                        <select id="editRole" style="width: 100%; padding: 14px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; font-family: 'Inter', sans-serif;">
-                            <option value="user" ${!user.isAdmin ? 'selected' : ''}>User</option>
-                            <option value="admin" ${user.isAdmin ? 'selected' : ''}>Admin</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn">Сохранить изменения</button>
-                </form>
-            `;
-        };
-
-        // UPDATE USER
-        window.updateUser = async function(e, userId) {
-            e.preventDefault();
-            const name = document.getElementById('editName').value;
-            const balance = parseFloat(document.getElementById('editBalance').value);
-            const isAdmin = document.getElementById('editRole').value === 'admin';
-            
-            await updateDoc(doc(db, 'users', userId), {
-                name: name,
-                balance: balance,
-                isAdmin: isAdmin
-            });
-            
-            closeModal();
-            showNotification('Пользователь обновлен!', 'success');
-            loadAdminData();
-        };
-
-        // GIVE MONEY TO USER
-        window.giveMoneyToUser = function(userId) {
-            const user = window.allUsers.find(u => u.id === userId);
-            if (!user) return;
-            
-            const amount = prompt(`Выдать деньги для @${user.username}.\nВведите сумму:`);
-            if (!amount || isNaN(amount)) return;
-            
-            updateDoc(doc(db, 'users', userId), {
-                balance: increment(parseFloat(amount))
-            });
-            
-            showNotification(`Выдано ${parseFloat(amount).toLocaleString()} FB для @${user.username}`, 'success');
-            setTimeout(() => loadAdminData(), 1000);
-        };
-
-        // REGISTER
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('registerName').value.trim();
-            const username = document.getElementById('registerUsername').value.trim().toLowerCase().replace('@', '');
-            const password = document.getElementById('registerPassword').value;
-            const email = `${username}@funbank.app`;
-
-            if (username.length < 3) {
-                showNotification('Username должен быть минимум 3 символа', 'error');
-                return;
-            }
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const uid = userCredential.user.uid;
-                const isAdmin = username === 'lunkes';
-
-                await setDoc(doc(db, 'users', uid), {
-                    name: name,
-                    username: username,
-                    email: email,
-                    balance: 1000,
-                    isAdmin: isAdmin,
-                    premium: false,
-                    advertising: false,
-                    createdAt: Date.now(),
-                    lastDaily: 0,
-                    business: null,
-                    transactions: []
-                });
-
-                showNotification('Добро пожаловать в FunBank!', 'success');
-            } catch (error) {
-                if (error.code === 'auth/email-already-in-use') {
-                    showNotification('Этот username уже занят', 'error');
-                } else {
-                    showNotification('Ошибка: ' + error.message, 'error');
-                }
-            }
-        });
-
-        // LOGIN
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('loginUsername').value.trim().toLowerCase().replace('@', '');
-            const password = document.getElementById('loginPassword').value;
-            const email = `${username}@funbank.app`;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showNotification('Вход выполнен успешно', 'success');
-            } catch (error) {
-                showNotification('Неверный username или пароль', 'error');
-            }
-        });
-
-        // LOGOUT
-        window.logout = async function() {
-            if (confirm('Выйти из аккаунта?')) {
-                await signOut(auth);
-                window.location.reload();
-            }
-        };
-
-        // SWITCH TABS
-        window.switchTab = function(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            if (tab === 'login') {
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('registerForm').classList.add('hidden');
-            } else {
-                document.getElementById('registerForm').classList.remove('hidden');
-                document.getElementById('loginForm').classList.add('hidden');
-            }
-        };
-
-        // TOGGLE SIDEBAR
-        window.toggleSidebar = function() {
-            document.getElementById('sidebar').classList.toggle('active');
-        };
-
-        // SWITCH PAGE
-        window.switchPage = function(page) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            document.getElementById(page + 'Page').classList.add('active');
-            
-            const titles = {
-                main: { title: 'Главная', subtitle: 'Обзор вашего счета' },
-                business: { title: 'Бизнес', subtitle: 'Управление компаниями' },
-                leaderboard: { title: 'Рейтинг', subtitle: 'Топ игроков' },
-                profile: { title: 'Профиль', subtitle: 'Персональные данные' },
-                admin: { title: 'Админ-панель', subtitle: 'Управление системой' }
-            };
-            
-            if (titles[page]) {
-                document.getElementById('pageTitle').textContent = titles[page].title;
-                document.getElementById('pageSubtitle').textContent = titles[page].subtitle;
-            }
-            
-            if (page === 'leaderboard') loadLeaderboard();
-            if (page === 'admin' && window.userData.isAdmin) loadAdminData();
-            
-            // Close sidebar on mobile
-            if (window.innerWidth <= 1024) {
-                document.getElementById('sidebar').classList.remove('active');
-            }
-        };
-
-        // CLAIM DAILY
-        window.claimDaily = async function() {
-            const now = Date.now();
-            const lastDaily = window.userData.lastDaily || 0;
-            const dayInMs = 24 * 60 * 60 * 1000;
-
-            if (now - lastDaily < dayInMs) {
-                const timeLeft = dayInMs - (now - lastDaily);
-                const hoursLeft = Math.floor(timeLeft / (60 * 60 * 1000));
-                showNotification(`Следующий бонус через ${hoursLeft}ч`, 'error');
-                return;
-            }
-
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                balance: increment(500),
-                lastDaily: now
-            });
-
-            window.userData.balance += 500;
-            window.userData.lastDaily = now;
-            updateUI();
-            showNotification('Получено 500 FB!', 'success');
-        };
-
-        // CREATE BUSINESS
-        window.createBusiness = async function(type) {
-            const prices = { business: 10000, company: 50000, corporation: 100000 };
-            const price = prices[type];
-
-            if (window.userData.balance < price) {
-                showNotification(`Недостаточно средств. Нужно ${price.toLocaleString()} FB`, 'error');
-                return;
-            }
-
-            if (window.userData.business) {
-                showNotification('У вас уже есть бизнес', 'error');
-                return;
-            }
-
-            if (!confirm(`Купить бизнес за ${price.toLocaleString()} FB?`)) return;
-
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                balance: increment(-price),
-                business: {
-                    type: type,
-                    createdAt: Date.now(),
-                    lastClaim: Date.now()
-                }
-            });
-
-            window.userData.balance -= price;
-            window.userData.business = { type, createdAt: Date.now(), lastClaim: Date.now() };
-            updateUI();
-            showNotification('Бизнес успешно создан!', 'success');
-        };
-
-        // CLAIM BUSINESS
-        window.claimBusinessIncome = async function() {
-            const business = window.userData.business;
-            const now = Date.now();
-            const twoHours = 2 * 60 * 60 * 1000;
-
-            if (now - business.lastClaim < twoHours) {
-                showNotification('Доход можно собрать раз в 2 часа', 'error');
-                return;
-            }
-
-            const incomes = { business: 500, company: 2000, corporation: 5000 };
-            const income = incomes[business.type];
-
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                balance: increment(income),
-                'business.lastClaim': now
-            });
-
-            window.userData.balance += income;
-            window.userData.business.lastClaim = now;
-            updateUI();
-            showNotification(`Получено ${income.toLocaleString()} FB!`, 'success');
-        };
-
-        // OPEN MODAL
-        window.openModal = function(type) {
-            const modal = document.getElementById('modal');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
-            modal.classList.add('active');
-
-            if (type === 'transfer') {
-                title.textContent = 'Перевод денег';
-                body.innerHTML = `
-                    <form class="auth-form" onsubmit="sendTransfer(event)">
-                        <div class="form-group">
-                            <label>Получатель</label>
-                            <input type="text" id="transferUsername" placeholder="username" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Сумма</label>
-                            <input type="number" id="transferAmount" placeholder="100" min="1" required>
-                        </div>
-                        <button type="submit" class="btn">Отправить</button>
-                    </form>
-                `;
-            } else if (type === 'premium') {
-                const isPremium = window.userData.premium && window.userData.premiumUntil > Date.now();
-                title.textContent = 'FunBank Premium';
-                body.innerHTML = `
-                    <div class="business-item" style="flex-direction: column; align-items: flex-start; margin-bottom: 0;">
-                        <div class="business-left" style="width: 100%; margin-bottom: 16px;">
-                            <div class="business-icon-wrapper">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                                </svg>
-                            </div>
-                            <div class="business-details">
-                                <h4>Premium подписка</h4>
-                                <p>• Пассивный доход +100 FB/час<br>• Эксклюзивный значок<br>• Приоритетная поддержка</p>
-                            </div>
-                        </div>
-                        <div style="width: 100%; text-align: center;">
-                            <div style="font-size: 24px; font-weight: 700; color: var(--purple-primary); margin-bottom: 16px;">10,000 FB / неделя</div>
-                            <button class="btn" onclick="buyPremium()">${isPremium ? 'Продлить' : 'Купить'} Premium</button>
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'notifications') {
-                title.textContent = 'Уведомления';
-                body.innerHTML = `<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><div class="empty-text">Нет новых уведомлений</div></div>`;
-            } else if (type === 'settings') {
-                title.textContent = 'Настройки';
-                body.innerHTML = `
-                    <ul class="action-list">
-                        <li class="action-item">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <span>${window.userData.email}</span>
-                        </li>
-                        <li class="action-item">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                            <span>@${window.userData.username}</span>
-                        </li>
-                    </ul>
-                    <button class="btn btn-danger" onclick="logout()">Выйти</button>
-                `;
-            }
-        };
-
-        // ADMIN MODALS
-        window.openAdminModal = function(type) {
-            openModal('custom');
-            
-            if (type === 'giveAdmin') {
-                document.getElementById('modalTitle').textContent = 'Выдать админку';
-                document.getElementById('modalBody').innerHTML = `
-                    <form class="auth-form" onsubmit="giveAdminRights(event)">
-                        <div class="form-group">
-                            <label>Username пользователя</label>
-                            <input type="text" id="adminUsername" placeholder="username" required>
-                        </div>
-                        <button type="submit" class="btn">Выдать права администратора</button>
-                    </form>
-                `;
-            } else if (type === 'giveMoney') {
-                document.getElementById('modalTitle').textContent = 'Выдать деньги';
-                document.getElementById('modalBody').innerHTML = `
-                    <form class="auth-form" onsubmit="giveMoneyAdmin(event)">
-                        <div class="form-group">
-                            <label>Username получателя</label>
-                            <input type="text" id="moneyUsername" placeholder="username" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Сумма (FB)</label>
-                            <input type="number" id="moneyAmount" placeholder="1000" min="1" required>
-                        </div>
-                        <button type="submit" class="btn">Выдать деньги</button>
-                    </form>
-                `;
-            } else if (type === 'broadcast') {
-                document.getElementById('modalTitle').textContent = 'Рассылка';
-                document.getElementById('modalBody').innerHTML = `
-                    <form class="auth-form" onsubmit="sendBroadcast(event)">
-                        <div class="form-group">
-                            <label>Сообщение</label>
-                            <textarea id="broadcastMessage" placeholder="Введите сообщение для всех пользователей" rows="5" style="width: 100%; padding: 14px 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; font-family: 'Inter', sans-serif; resize: vertical;" required></textarea>
-                        </div>
-                        <button type="submit" class="btn">Отправить всем</button>
-                    </form>
-                `;
-            } else if (type === 'createPromo') {
-                document.getElementById('modalTitle').textContent = 'Создать промокод';
-                document.getElementById('modalBody').innerHTML = `
-                    <form class="auth-form" onsubmit="createPromoCode(event)">
-                        <div class="form-group">
-                            <label>Код промокода</label>
-                            <input type="text" id="promoCode" placeholder="WELCOME2024" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Награда (FB)</label>
-                            <input type="number" id="promoReward" placeholder="1000" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Количество использований</label>
-                            <input type="number" id="promoUses" placeholder="100" min="1" required>
-                        </div>
-                        <button type="submit" class="btn">Создать промокод</button>
-                    </form>
-                `;
-            }
-        };
-
-        // GIVE ADMIN RIGHTS
-        window.giveAdminRights = async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('adminUsername').value.trim().toLowerCase();
-            
-            const usersRef = collection(db, 'users');
-            const q = query(usersRef, where('username', '==', username));
-            const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                showNotification('Пользователь не найден', 'error');
-                return;
-            }
-            
-            let userId = null;
-            snapshot.forEach(doc => { userId = doc.id; });
-            
-            await updateDoc(doc(db, 'users', userId), { isAdmin: true });
-            
-            closeModal();
-            showNotification(`Админка выдана @${username}`, 'success');
-            loadAdminData();
-        };
-
-        // GIVE MONEY ADMIN
-        window.giveMoneyAdmin = async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('moneyUsername').value.trim().toLowerCase();
-            const amount = parseFloat(document.getElementById('moneyAmount').value);
-            
-            const usersRef = collection(db, 'users');
-            const q = query(usersRef, where('username', '==', username));
-            const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                showNotification('Пользователь не найден', 'error');
-                return;
-            }
-            
-            let userId = null;
-            snapshot.forEach(doc => { userId = doc.id; });
-            
-            await updateDoc(doc(db, 'users', userId), { balance: increment(amount) });
-            
-            closeModal();
-            showNotification(`Выдано ${amount.toLocaleString()} FB для @${username}`, 'success');
-            loadAdminData();
-        };
-
-        // SEND BROADCAST
-        window.sendBroadcast = function(e) {
-            e.preventDefault();
-            const message = document.getElementById('broadcastMessage').value;
-            
-            // В реальной версии отправить через Firebase Cloud Messaging
-            closeModal();
-            showNotification('Рассылка отправлена всем пользователям', 'success');
-        };
-
-        // CREATE PROMO CODE
-        window.createPromoCode = function(e) {
-            e.preventDefault();
-            const code = document.getElementById('promoCode').value;
-            const reward = parseFloat(document.getElementById('promoReward').value);
-            const uses = parseInt(document.getElementById('promoUses').value);
-            
-            // Сохранить промокод в Firestore
-            closeModal();
-            showNotification(`Промокод ${code} создан`, 'success');
-        };
-
-        window.closeModal = function() {
-            document.getElementById('modal').classList.remove('active');
-        };
-
-        // SEND TRANSFER
-        window.sendTransfer = async function(e) {
-            e.preventDefault();
-            const recipientUsername = document.getElementById('transferUsername').value.trim().toLowerCase().replace('@', '');
-            const amount = parseInt(document.getElementById('transferAmount').value);
-
-            if (amount > window.userData.balance) {
-                showNotification('Недостаточно средств', 'error');
-                return;
-            }
-
-            if (recipientUsername === window.userData.username) {
-                showNotification('Нельзя переводить самому себе', 'error');
-                return;
-            }
-
-            const usersRef = collection(db, 'users');
-            const q = query(usersRef, where('username', '==', recipientUsername));
-            const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                showNotification('Пользователь не найден', 'error');
-                return;
-            }
-
-            let recipientId = null;
-            snapshot.forEach(doc => { recipientId = doc.id; });
-
-            await updateDoc(doc(db, 'users', currentUser.uid), { balance: increment(-amount) });
-            await updateDoc(doc(db, 'users', recipientId), { balance: increment(amount) });
-
-            window.userData.balance -= amount;
-            updateUI();
-            closeModal();
-            showNotification(`Отправлено ${amount.toLocaleString()} FB → @${recipientUsername}`, 'success');
-        };
-
-        // BUY PREMIUM
-        window.buyPremium = async function() {
-            if (window.userData.balance < 10000) {
-                showNotification('Недостаточно средств', 'error');
-                return;
-            }
-
-            if (!confirm('Купить Premium за 10,000 FB?')) return;
-
-            const weekInMs = 7 * 24 * 60 * 60 * 1000;
-
-            await updateDoc(doc(db, 'users', currentUser.uid), {
-                balance: increment(-10000),
-                premium: true,
-                premiumUntil: Date.now() + weekInMs
-            });
-
-            window.userData.balance -= 10000;
-            window.userData.premium = true;
-            window.userData.premiumUntil = Date.now() + weekInMs;
-            updateUI();
-            closeModal();
-            showNotification('Premium активирован на 7 дней!', 'success');
-        };
-
-        // LOAD LEADERBOARD
-        async function loadLeaderboard() {
-            const usersRef = collection(db, 'users');
-            const q = query(usersRef, orderBy('balance', 'desc'), limit(50));
-            const snapshot = await getDocs(q);
-
-            let html = '';
-            let rank = 1;
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
-                const isPremium = data.premium && data.premiumUntil > Date.now();
-                
-                html += `
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank ${rankClass}">${rank}</div>
-                        <div class="leaderboard-info">
-                            <div class="leaderboard-username">@${data.username} ${isPremium ? '⭐' : ''}</div>
-                        </div>
-                        <div class="leaderboard-balance">${Math.floor(data.balance).toLocaleString()} FB</div>
-                    </div>
-                `;
-                rank++;
-            });
-
-            document.getElementById('leaderboardContent').innerHTML = html || '<div class="empty-state"><svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg><div class="empty-text">Рейтинг пуст</div></div>';
-        }
-
-        // TIMERS
-        function startTimers() {
-            setInterval(() => {
-                if (window.userData.business) {
-                    const lastClaim = window.userData.business.lastClaim;
-                    const nextClaim = lastClaim + (2 * 60 * 60 * 1000);
-                    const remaining = Math.max(0, nextClaim - Date.now());
-                    const timerEl = document.getElementById('businessTimer');
-                    if (timerEl) {
-                        timerEl.textContent = formatTime(remaining);
-                        const btn = document.getElementById('claimBusinessBtn');
-                        if (btn) btn.disabled = remaining > 0;
-                    }
-                }
-            }, 1000);
-
-            setInterval(async () => {
-                if (!currentUser || !window.userData) return;
-                let balanceChange = 0;
-                if (window.userData.premium && window.userData.premiumUntil > Date.now()) balanceChange += 100;
-                if (window.userData.business) {
-                    const taxes = { business: 50, company: 200, corporation: 500 };
-                    balanceChange -= taxes[window.userData.business.type];
-                }
-                if (balanceChange !== 0) {
-                    await updateDoc(doc(db, 'users', currentUser.uid), { balance: increment(balanceChange) });
-                    window.userData.balance += balanceChange;
-                    updateUI();
-                    showNotification(balanceChange > 0 ? `Пассивный доход: +${balanceChange} FB` : `Расходы: ${balanceChange} FB`, balanceChange > 0 ? 'success' : 'info');
-                }
-            }, 60 * 60 * 1000);
-        }
-
-        function formatTime(ms) {
-            const hours = Math.floor(ms / (60 * 60 * 1000));
-            const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
-            const seconds = Math.floor((ms % (60 * 1000)) / 1000);
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
-        console.log('🏦 FunBank загружен!');
+        // Продолжение в следующем сообщении...
     </script>
 </body>
 </html>
