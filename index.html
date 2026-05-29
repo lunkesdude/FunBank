@@ -2473,19 +2473,12 @@ body {
 <script type="module">
 import { initializeApp } from 
 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { 
-  getAuth, createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  onAuthStateChanged, signOut 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-import { 
-  getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, 
-  collection, query, orderBy, limit, getDocs, increment, 
-  where, addDoc, serverTimestamp 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-/* ================= FIREBASE ================= */
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+onAuthStateChanged, signOut } from 
+'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, 
+query, orderBy, limit, getDocs, increment, where, addDoc, serverTimestamp } 
+from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
  apiKey: "AIzaSyDMrSrz1xKauScKRzWWAx8nkuMnFrwJ6pg",
@@ -2503,248 +2496,177 @@ const db = getFirestore(app);
 let CU = null;
 let UD = null;
 
-/* ================= ROLE SYSTEM ================= */
+/* =========================
+   ROLES SYSTEM
+========================= */
 
-function getRole(user) {
-  if (!user) return 'user';
-  if (user.username?.toLowerCase() === 'lunkes') return 'developer';
-  if (user.isAdmin) return 'admin';
-  return 'user';
+function getRole(userData){
+  if(userData.username === "lunkes") return "developer";
+  if(userData.isAdmin) return "admin";
+  return "user";
 }
 
-function isDeveloper() {
-  return getRole(UD) === 'developer';
-}
-
-function canEditUser(targetUser) {
-  if (getRole(targetUser) === 'developer') return false;
-  if (isDeveloper()) return true;
-  if (getRole(UD) === 'admin' && getRole(targetUser) !== 'admin')
-    return true;
+function canEdit(targetUser){
+  const myRole = getRole(UD);
+  const targetRole = getRole(targetUser);
+  if(myRole === "developer") return true;
+  if(myRole === "admin" && targetRole === "developer") return false;
+  if(myRole === "admin") return true;
   return false;
 }
 
-/* ================= THEMES ================= */
+/* =========================
+   AUTH
+========================= */
 
-window.setTheme = (theme) => {
-  document.body.classList.remove('dark','black');
-  if (theme === 'dark') document.body.classList.add('dark');
-  if (theme === 'black') document.body.classList.add('black');
-  localStorage.setItem('theme', theme);
+window.doRegister = async (e)=>{
+ e.preventDefault();
+ const name = regName.value.trim();
+ const username = regUser.value.trim().toLowerCase();
+ const pass = regPass.value;
+ const email = username + "@funbank.app";
+
+ const cred = await createUserWithEmailAndPassword(auth,email,pass);
+ const uid = cred.user.uid;
+
+ await setDoc(doc(db,'users',uid),{
+   name,
+   username,
+   email,
+   balance: 1000,
+   isAdmin: false,
+   businesses: [],
+   inventory: [],
+   rating: 0,
+   ratingVotes: 0,
+   createdAt: Date.now()
+ });
 };
 
-window.setAccent = (color) => {
-  document.documentElement.style.setProperty('--accent-primary', color.main);
-  document.documentElement.style.setProperty('--accent-light', color.light);
-  localStorage.setItem('accent', JSON.stringify(color));
+/* =========================
+   THEMES
+========================= */
+
+window.setTheme = (mode)=>{
+ document.body.classList.remove("dark","black");
+ if(mode==="dark") document.body.classList.add("dark");
+ if(mode==="black") document.body.classList.add("black");
+ localStorage.setItem("theme",mode);
 };
 
-function initTheme() {
-  const t = localStorage.getItem('theme');
-  if (t) setTheme(t);
-  const a = localStorage.getItem('accent');
-  if (a) setAccent(JSON.parse(a));
-}
-
-/* ================= AUTH ================= */
-
-window.doRegister = async (e) => {
-  e.preventDefault();
-  const username = regUser.value.trim().toLowerCase();
-  const pass = regPass.value;
-  const email = username + "@funbank.app";
-
-  const cred = await createUserWithEmailAndPassword(auth,email,pass);
-
-  await setDoc(doc(db,'users',cred.user.uid),{
-    username,
-    name: regName.value,
-    balance: 1000,
-    isAdmin: false,
-    businesses: [],
-    inventory: [],
-    rating: { total:0, count:0 },
-    createdAt: Date.now()
-  });
+window.setAccentColor = (color)=>{
+ document.documentElement.style.setProperty('--accent-primary',color);
+ localStorage.setItem("accent",color);
 };
 
-window.doLogin = async (e)=>{
-  e.preventDefault();
-  const username = loginUser.value.trim().toLowerCase();
-  const pass = loginPass.value;
-  const email = username + "@funbank.app";
-  await signInWithEmailAndPassword(auth,email,pass);
-};
-
-onAuthStateChanged(auth, async(user)=>{
-  if(!user) return;
-  CU = user;
-  const snap = await getDoc(doc(db,'users',user.uid));
-  UD = snap.data();
-  initTheme();
-  renderUser();
-  loadShop();
-});
-
-/* ================= BUSINESS (5 LIMIT) ================= */
+/* =========================
+   MULTI BUSINESS (5 MAX)
+========================= */
 
 window.createBusiness = async(type)=>{
-  if(!UD.businesses) UD.businesses=[];
-  if(UD.businesses.length>=5){
-    alert("Лимит 5 бизнесов");
-    return;
-  }
-  UD.businesses.push({
-    type,
-    createdAt: Date.now()
-  });
-  await updateDoc(doc(db,'users',CU.uid),{
-    businesses: UD.businesses
-  });
+ if(UD.businesses.length>=5){
+   alert("Лимит 5 бизнесов");
+   return;
+ }
+ const prices = {small:10000,medium:50000,big:100000};
+ if(UD.balance < prices[type]) return alert("Недостаточно средств");
+
+ UD.balance -= prices[type];
+ UD.businesses.push({type,createdAt:Date.now()});
+
+ await updateDoc(doc(db,'users',CU.uid),{
+   balance:UD.balance,
+   businesses:UD.businesses
+ });
 };
 
-/* ================= SHOP SYSTEM ================= */
+/* =========================
+   SHOP SYSTEM
+========================= */
 
-async function loadShop(){
-  const snap = await getDocs(collection(db,'shopItems'));
-  let html='';
-  snap.forEach(d=>{
-    const item=d.data();
-    if(item.status!=='approved') return;
-    html+=`
-      <div class="shop-item">
-        <div class="shop-item-header">
-          <div>
-            <h4>${item.name}</h4>
-            <div class="shop-item-seller">@${item.seller}</div>
-          </div>
-          <div class="shop-item-price">${item.price} FB</div>
-        </div>
-        <div class="shop-item-desc">${item.description}</div>
-        <button class="btn" onclick="buyItem('${d.id}')">Купить</button>
-      </div>
-    `;
-  });
-  const el=document.getElementById('shopWrap');
-  if(el) el.innerHTML=html;
-}
-
-window.buyItem = async(id)=>{
-  const ref=doc(db,'shopItems',id);
-  const snap=await getDoc(ref);
-  const item=snap.data();
-  if(UD.balance<item.price) return alert("Недостаточно средств");
-
-  UD.balance-=item.price;
-  UD.inventory.push(item);
-
-  await updateDoc(doc(db,'users',CU.uid),{
-    balance: UD.balance,
-    inventory: UD.inventory
-  });
-
-  alert("Куплено!");
+window.createShopItem = async(data)=>{
+ await addDoc(collection(db,'shop'),{
+   ...data,
+   seller: UD.username,
+   status: "pending",
+   createdAt: serverTimestamp()
+ });
 };
-
-/* ================= DEVELOPER MODERATION ================= */
 
 window.approveItem = async(id)=>{
-  if(!isDeveloper()) return;
-  await updateDoc(doc(db,'shopItems',id),{status:'approved'});
+ if(getRole(UD)!=="developer") return;
+ await updateDoc(doc(db,'shop',id),{status:"approved"});
 };
 
-window.rejectItem = async(id)=>{
-  if(!isDeveloper()) return;
-  await updateDoc(doc(db,'shopItems',id),{status:'rejected'});
+window.buyItem = async(item)=>{
+ if(UD.balance < item.price) return;
+ UD.balance -= item.price;
+ UD.inventory.push(item);
+
+ await updateDoc(doc(db,'users',CU.uid),{
+   balance:UD.balance,
+   inventory:UD.inventory
+ });
 };
 
-/* ================= INVENTORY ================= */
+window.sellInventoryItem = async(index)=>{
+ const item = UD.inventory[index];
+ UD.balance += item.price;
+ UD.inventory.splice(index,1);
 
-window.renderInventory = ()=>{
-  let html='';
-  (UD.inventory||[]).forEach((item,i)=>{
-    html+=`
-      <div class="inventory-item">
-        <div class="inventory-item-name">${item.name}</div>
-        <div class="inventory-item-actions">
-          <button class="btn btn-success" onclick="setProfileItem(${i})">В профиль</button>
-          <button class="btn btn-danger" onclick="sellItem(${i})">Продать</button>
-        </div>
-      </div>
-    `;
-  });
-  document.getElementById('inventoryWrap').innerHTML=html;
+ await updateDoc(doc(db,'users',CU.uid),{
+   balance:UD.balance,
+   inventory:UD.inventory
+ });
 };
 
-window.sellItem = async(i)=>{
-  const item=UD.inventory[i];
-  UD.balance+=item.price;
-  UD.inventory.splice(i,1);
-  await updateDoc(doc(db,'users',CU.uid),{
-    balance:UD.balance,
-    inventory:UD.inventory
-  });
-  renderInventory();
+/* =========================
+   PROFILE VIEW + RATING
+========================= */
+
+window.viewProfile = async(username)=>{
+ const q = query(collection(db,'users'),where("username","==",username));
+ const snap = await getDocs(q);
+ if(snap.empty) return;
+ const data = snap.docs[0].data();
+ alert(`Профиль @${username}\nБаланс: ${data.balance}\nРейтинг: ${data.rating}`);
 };
 
-window.setProfileItem = async(i)=>{
-  const item=UD.inventory[i];
-  await updateDoc(doc(db,'users',CU.uid),{
-    profileItem:item
-  });
+window.rateUser = async(username,value)=>{
+ const q = query(collection(db,'users'),where("username","==",username));
+ const snap = await getDocs(q);
+ if(snap.empty) return;
+
+ const docRef = doc(db,'users',snap.docs[0].id);
+ const user = snap.docs[0].data();
+ const newVotes = (user.ratingVotes||0)+1;
+ const newRating = ((user.rating||0)* (newVotes-1) + value)/newVotes;
+
+ await updateDoc(docRef,{
+   rating:newRating,
+   ratingVotes:newVotes
+ });
 };
 
-/* ================= RATING SYSTEM ================= */
+/* =========================
+   AUTH STATE
+========================= */
 
-window.rateUser = async(targetId,value)=>{
-  const ref=doc(db,'users',targetId);
-  const snap=await getDoc(ref);
-  const u=snap.data();
-  const newTotal=(u.rating?.total||0)+value;
-  const newCount=(u.rating?.count||0)+1;
-  await updateDoc(ref,{
-    rating:{ total:newTotal,count:newCount }
-  });
-};
+onAuthStateChanged(auth,async(user)=>{
+ if(user){
+   CU = user;
+   const snap = await getDoc(doc(db,'users',user.uid));
+   UD = snap.data();
 
-/* ================= VIEW PROFILE ================= */
+   const theme = localStorage.getItem("theme");
+   if(theme) setTheme(theme);
 
-window.viewProfile = async(uid)=>{
-  const snap=await getDoc(doc(db,'users',uid));
-  const u=snap.data();
-  alert("Профиль @"+u.username+
-        "\nБаланс: "+u.balance+
-        "\nРейтинг: "+
-        (u.rating?.count?
-          (u.rating.total/u.rating.count).toFixed(1):"0"));
-};
+   const accent = localStorage.getItem("accent");
+   if(accent) setAccentColor(accent);
+ }
+});
 
-/* ================= RENDER ================= */
-
-function renderUser(){
-  document.getElementById('sidebarUsername').textContent='@'+UD.username;
-  document.getElementById('walletBalance').textContent=UD.balance;
-}
-
-/* ================= EXTRA CHANGELOG ADD ================= */
-
-console.log("FunBank v3.0 Loaded 🚀");
-
-/*
-НОВОЕ:
-- ✅ Чёрная тема
-- ✅ Смена основного цвета
-- ✅ Developer роль (@Lunkes)
-- ✅ Админы не могут менять Developer
-- ✅ Магазин с модерацией
-- ✅ 5 бизнесов
-- ✅ Инвентарь
-- ✅ Продажа предметов
-- ✅ Рейтинг пользователей
-- ✅ Просмотр профилей
-- ✅ Улучшенные анимации
-*/
+console.log("FunBank v3.0.0 FULL SYSTEM LOADED ✅");
 </script>
-
 </body>
 </html>
