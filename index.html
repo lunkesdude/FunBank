@@ -3689,13 +3689,13 @@ function renderBizList() {
   }
 
   const types = {
-    small: {label:'Малый', income:500},
-    medium: {label:'Компания', income:2000},
-    big: {label:'Корпорация', income:5000}
+    small: { label: 'Малый', income: 500 },
+    medium: { label: 'Компания', income: 2000 },
+    big: { label: 'Корпорация', income: 5000 }
   };
 
   wrap.innerHTML = bizs.map((biz, i) => {
-    const t = types[biz.type];
+    const t = types[biz.type] || { label: 'Неизвестно', income: 0 };
     const icon = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>';
     return `
       <div class="business-item">
